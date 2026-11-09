@@ -121,14 +121,14 @@
       </div>
       <label class="check"><input type="checkbox" id="indexado"><span>Los salarios se indexan para sostener esa meta. Sin indexación, la paritaria se fija sobre una inflación de referencia de 18% y la devaluación erosiona el salario.</span></label>
       <div class="control">
-        <label for="tasa">Tasa de interés real (anual) <output id="o-tasa"></output></label>
-        <input type="range" id="tasa" min="-5" max="40" step="0.5">
-        <div class="ayuda">Motor 2: crédito. Más baja, más crédito y consumo.</div>
+        <label for="tasa">Tasa de interés nominal (anual) <output id="o-tasa"></output></label>
+        <input type="range" id="tasa" min="5" max="100" step="1">
+        <div class="ayuda">Motor 2: crédito. Más baja, más crédito y consumo. Es la tasa que compite con el dólar: contiene la dolarización si supera a la devaluación más la prima de riesgo.</div>
       </div>
       <div class="control">
         <label for="dev">Ritmo devaluatorio mensual <output id="o-dev"></output></label>
         <input type="range" id="dev" min="0" max="4" step="0.1">
-        <div class="ayuda">Con salarios indexados, devaluar más solo acelera la inflación.</div>
+        <div class="ayuda">Con salarios indexados, devaluar más acelera la inflación y, con la tasa nominal fija, baja la tasa real y el rendimiento de los pesos.</div>
       </div>
 
       <h3>Indicadores abiertos</h3>
@@ -169,7 +169,7 @@
         </div>
         <div class="tarjeta">
           <h3>Precios relativos y cartera</h3>
-          <div class="metrica"><div class="nombre">Tasa nominal implícita</div><div class="valor" id="m-nom"></div></div>
+          <div class="metrica"><div class="nombre">Tasa real resultante</div><div class="valor" id="m-nom"></div></div>
           <div class="metrica"><div class="nombre">Tipo de cambio real</div><div class="valor" id="m-tcr"></div></div>
           <div class="metrica"><div class="nombre">Salto esperado después de octubre</div><div class="valor" id="m-salto"></div></div>
           <div class="metrica"><div class="nombre">Dolarización del ahorro</div><div class="valor" id="m-dol"></div></div>
@@ -202,7 +202,7 @@
     <div class="grilla gc">
       <div class="tarjeta">
         <h2>Más salario, más brecha…</h2>
-        <p class="sub chico">Brecha sin cubrir según el salario real, con tres tasas reales y el resto de tus opciones. Debajo de cero, la brecha está cubierta.</p>
+        <p class="sub chico">Brecha sin cubrir según el salario real, con tres tasas nominales y el resto de tus opciones. Debajo de cero, la brecha está cubierta.</p>
         <div class="graf"><canvas id="g1" aria-label="Brecha según salario real y tasa"></canvas></div>
       </div>
       <div class="tarjeta">
@@ -215,7 +215,7 @@
 
   <section class="tarjeta">
     <h2>De más a menos sostenible</h2>
-    <p class="sub chico">Combinaciones de salario real y tasa real, con la devaluación, la indexación, los indicadores abiertos y los puentes que elegiste, ordenadas por la brecha que dejan. En negrita, tu combinación.</p>
+    <p class="sub chico">Combinaciones de salario real y tasa nominal, con la devaluación, la indexación, los indicadores abiertos y los puentes que elegiste, ordenadas por la brecha que dejan. En negrita, tu combinación.</p>
     <div class="tabla-wrap"><table id="ranking"></table></div>
   </section>
 
@@ -228,16 +228,16 @@
     <details open>
       <summary>Cómo funciona el modelo</summary>
       <p style="margin-top:12px">Supuestos: no hay acceso al mercado internacional de capitales; la economía es abierta; no hay límites al atesoramiento de las personas; hay superávit fiscal, así que el impulso de demanda no es fiscal.</p>
-      <p>Notación: d = devaluación anual, π = inflación, w = salario nominal, ŵ = salario real, q = productividad, b = impulso de demanda, r = tasa real, α = peso de los transables (0,4), κ = traslado de la demanda a precios, β = sensibilidad de la cuenta corriente, s = salto esperado después de las elecciones.</p>
+      <p>Notación: i = tasa de interés nominal, d = devaluación anual, π = inflación, w = salario nominal, ŵ = salario real, q = productividad, b = impulso de demanda, r = tasa real, α = peso de los transables (0,4), κ = traslado de la demanda a precios, β = sensibilidad de la cuenta corriente, s = salto esperado después de las elecciones.</p>
       <ul>
         <li>Precios por costos: <span class="formula">π = α·d + (1 − α)·(w − q) + κ·b</span></li>
         <li>Con salarios indexados a una meta real (w = π + ŵ): <span class="formula">π = d + [(1 − α)/α]·(ŵ − q) + (κ/α)·b</span>. Cada punto de devaluación pasa entero a precios.</li>
         <li>Tipo de cambio real: <span class="formula">ΔTCR ≈ d + π* − π ≈ π* − 1,5·(ŵ − q) − (κ/α)·b</span>. La apreciación es la contracara de los dos motores y no se corrige devaluando.</li>
-        <li>Demanda: <span class="formula">b = −γ·(r − r̄) + λ·ŵ</span>; actividad = 0,5% + b</li>
+        <li>Demanda: <span class="formula">b = −γ·(r − r̄) + λ·ŵ</span>, con tasa real <span class="formula">r = (1 + i)/(1 + π) − 1</span>; actividad = 0,5% + b</li>
         <li>Cuenta corriente: <span class="formula">CC = 4.533 + β·ΔTCR − importaciones por consumo</span></li>
         <li>Dolarización: <span class="formula">D = 24.000 + 1.500·apreciación − 600·(i − d − ρ₀ − s) + 400·ŵ</span>, con <span class="formula">s = 0,8·apreciación + 0,2·brecha/1.000</span></li>
         <li>Brecha: <span class="formula">13.300 − CC + D − IF − puentes</span>. Como el salto esperado depende de la brecha, se resuelve en forma iterativa.</li>
-        <li>La tasa que cierra la brecha es la tasa real mínima con la que la brecha llega a cero, con los puentes elegidos.</li>
+        <li>La tasa que cierra la brecha es la tasa nominal mínima con la que la brecha llega a cero, con los puentes elegidos.</li>
         <li>La emisión internacional solo está disponible si la prima total no supera el 9%.</li>
       </ul>
       <p class="ayuda">Modelo estilizado con fines didácticos. Los datos de la brecha son de CIFRA y la cuenta corriente inicial es un supuesto del autor. Los parámetros de comportamiento son ilustrativos, no estimados econométricamente, y están en <code>modelo.js</code>.</p>
@@ -286,7 +286,7 @@ function aplicarEscenario(k) {
   escenarioActivo = k; actualizar();
 }
 
-const TASAS_GRAF = [0, 10, 20];
+const TASAS_GRAF = [20, 35, 50];
 function opcionesGrafico(yTitulo, yFmt) {
   const tinta2 = css("--tinta2"), tenue = css("--tenue"), grilla = css("--grilla"), eje = css("--eje");
   return {
@@ -308,9 +308,9 @@ function datasets(v, actual, campo, transf) {
   const ds = TASAS_GRAF.map((t, j) => {
     const pts = [];
     for (let s = -4; s <= 6.001; s += 0.5) pts.push({ x: s, y: transf(simular({ ...v.pol, salario: s, tasa: t }, v.ab)[campo]) });
-    return { label: "Tasa real " + t + "%", data: pts, showLine: true, borderColor: colores[j], backgroundColor: colores[j], borderWidth: 2, pointRadius: 0, pointHitRadius: 6, tension: 0.2, order: 3 };
+    return { label: "Tasa nominal " + t + "%", data: pts, showLine: true, borderColor: colores[j], backgroundColor: colores[j], borderWidth: 2, pointRadius: 0, pointHitRadius: 6, tension: 0.2, order: 3 };
   });
-  ds.push({ label: "Tu posición (tasa " + fmt(v.pol.tasa) + "%)", data: [{ x: v.pol.salario, y: transf(actual[campo]) }], backgroundColor: css("--tinta"), borderColor: css("--superficie"), borderWidth: 2, pointStyle: "rectRot", pointRadius: 9, pointHoverRadius: 11, order: 1 });
+  ds.push({ label: "Tu posición (tasa " + fmt(v.pol.tasa, 0) + "%)", data: [{ x: v.pol.salario, y: transf(actual[campo]) }], backgroundColor: css("--tinta"), borderColor: css("--superficie"), borderWidth: 2, pointStyle: "rectRot", pointRadius: 9, pointHoverRadius: 11, order: 1 });
   return ds;
 }
 
@@ -318,7 +318,7 @@ function actualizar() {
   const v = leer();
   document.querySelectorAll(".botones button").forEach(b => b.setAttribute("aria-pressed", b.dataset.esc === escenarioActivo ? "true" : "false"));
   $("o-salario").textContent = pct(v.pol.salario, true);
-  $("o-tasa").textContent = pct(v.pol.tasa);
+  $("o-tasa").textContent = fmt(v.pol.tasa, 0) + "%";
   $("o-dev").textContent = fmt(v.pol.dev) + "%";
   $("o-beta").textContent = usd(v.ab.beta) + " por punto";
   $("a-beta").textContent = `${fmt(100 * v.ab.beta / PBI, 2)}% del PBI por punto de tipo de cambio real. La cuenta corriente se vuelve negativa con una apreciación de ${fmt(4533 / v.ab.beta)}%.`;
@@ -335,7 +335,7 @@ function actualizar() {
   $("m-sal").innerHTML = pct(r.salarioReal, true) + (r.salarioReal > 0.5 ? estado("bueno", "mejora") : r.salarioReal > -0.5 ? estado("alerta", "estancado") : estado("critico", "cae"));
   $("m-cons").innerHTML = pct(r.consumo, true) + (r.consumo > 2 ? estado("bueno", "crece") : r.consumo > 0 ? estado("alerta", "débil") : estado("critico", "cae"));
   $("m-act").innerHTML = pct(r.actividad, true) + (r.actividad > 1 ? estado("bueno", "crece") : r.actividad > 0 ? estado("alerta", "estancada") : estado("critico", "recesión"));
-  $("m-nom").textContent = pct(r.tasaNominal);
+  $("m-nom").textContent = pct(r.tasaReal, true);
   $("m-tcr").innerHTML = pct(r.tcr, true) + (r.tcr < -1 ? estado("critico", "se aprecia") : r.tcr < 2 ? estado("alerta", "estable") : estado("bueno", "se deprecia"));
   $("m-salto").innerHTML = pct(r.salto) + (r.salto < 2 ? estado("bueno", "bajo") : r.salto < 6 ? estado("alerta", "moderado") : estado("critico", "alto"));
   $("m-dol").innerHTML = usd(r.dolarizacion) + (r.dolarizacion <= 12000 ? estado("bueno", "contenida") : r.dolarizacion <= 24000 ? estado("alerta", "alta") : estado("critico", "se acelera"));
@@ -348,9 +348,9 @@ function actualizar() {
   // efecto de devaluar medio punto más por mes
   const rDev = simular({ ...v.pol, dev: v.pol.dev + 0.5 }, v.ab);
   $("p1").textContent = `Salario ${pct(r.salarioReal, true)} · consumo ${pct(r.consumo, true)}`;
-  $("p1d").textContent = `con una tasa real de ${pct(v.pol.tasa)} (nominal ${pct(r.tasaNominal)}) y la actividad en ${pct(r.actividad, true)}.`;
+  $("p1d").textContent = `con una tasa nominal de ${fmt(v.pol.tasa, 0)}% (real ${pct(r.tasaReal, true)}) y la actividad en ${pct(r.actividad, true)}.`;
   $("p2").textContent = `Inflación ${pct(r.infl)} · tipo de cambio real ${pct(r.tcr, true)}`;
-  $("p2d").textContent = `Devaluar medio punto más por mes llevaría la inflación a ${pct(rDev.infl)} y el tipo de cambio real solo a ${pct(rDev.tcr, true)}` + (v.pol.indexado ? ": con salarios indexados, la devaluación se va a precios." : `, porque el salario real caería a ${pct(rDev.salarioReal, true)}.`);
+  $("p2d").textContent = `Devaluar medio punto más por mes llevaría la inflación a ${pct(rDev.infl)}, la tasa real a ${pct(rDev.tasaReal, true)} y el tipo de cambio real a ${pct(rDev.tcr, true)}` + (v.pol.indexado ? ": con salarios indexados, la devaluación se va a precios y la dolarización sube a " + usd(rDev.dolarizacion) + "." : `, a costa de un salario real de ${pct(rDev.salarioReal, true)}.`);
   $("p3").textContent = `Brecha ${br <= 0 ? "cubierta" : usd(br)}`;
   $("p3d").textContent = `La dolarización llega a ${usd(r.dolarizacion)} y la cuenta corriente queda en ${usd(r.cuentaCorriente)}; se espera un salto de ${pct(r.salto)} después de octubre.`;
   if (!c.necesaria) {
@@ -359,17 +359,17 @@ function actualizar() {
     $("aplicar").disabled = true;
   } else if (c.tasa === null) {
     $("p4").textContent = "Ninguna tasa alcanza";
-    $("p4d").textContent = `Ni con 40% real se cierra (actividad ${pct(c.r.actividad, true)}). Hace falta bajar el salario real o sumar puentes.`;
+    $("p4d").textContent = `Ni con 150% se cierra (actividad ${pct(c.r.actividad, true)}). Hace falta bajar el salario real o sumar puentes.`;
     $("aplicar").disabled = true;
   } else {
-    $("p4").textContent = `Tasa real ${pct(c.tasa)} → actividad ${pct(c.r.actividad, true)}`;
-    $("p4d").textContent = `La tasa sube ${fmt(c.tasa - v.pol.tasa)} puntos: el consumo pasa a ${pct(c.r.consumo, true)} y la dolarización baja a ${usd(c.r.dolarizacion)}.`;
-    $("aplicar").disabled = c.tasa > 40;
+    $("p4").textContent = `Tasa ${fmt(c.tasa, 0)}% → actividad ${pct(c.r.actividad, true)}`;
+    $("p4d").textContent = `La tasa nominal sube ${fmt(c.tasa - v.pol.tasa, 0)} puntos (real ${pct(c.r.tasaReal, true)}): el consumo pasa a ${pct(c.r.consumo, true)} y la dolarización baja a ${usd(c.r.dolarizacion)}.`;
+    $("aplicar").disabled = c.tasa > 100;
   }
 
   let txt;
   if (br > 0 && c.necesaria && c.tasa !== null)
-    txt = `Con estos motores la actividad crece ${pct(r.actividad, true)}, pero la inflación por costos obliga a planchar el dólar (tipo de cambio real ${pct(r.tcr, true)}). La dolarización llega a ${usd(r.dolarizacion)} y la brecha queda en ${usd(br)}. Para cerrarla, la tasa real tiene que subir a ${pct(c.tasa)} y la actividad cae a ${pct(c.r.actividad, true)}: se apagan los motores.`;
+    txt = `Con estos motores la actividad crece ${pct(r.actividad, true)}, pero la inflación por costos obliga a planchar el dólar (tipo de cambio real ${pct(r.tcr, true)}). La dolarización llega a ${usd(r.dolarizacion)} y la brecha queda en ${usd(br)}. Para cerrarla, la tasa nominal tiene que subir a ${fmt(c.tasa, 0)}% y la actividad cae a ${pct(c.r.actividad, true)}: se apagan los motores.`;
   else if (br > 0)
     txt = `Faltan ${usd(br)} y ninguna tasa alcanza para cerrar la brecha. El ajuste llegaría por una caída del salario real o por un salto cambiario.`;
   else if (r.actividad <= 0.5)
@@ -388,15 +388,15 @@ function actualizar() {
 
 function ranking(v) {
   const filas = [];
-  for (const s of [-2, 0, 2, 4]) for (const t of [0, 5, 10, 15, 20]) filas.push({ s, t, r: simular({ ...v.pol, salario: s, tasa: t }, v.ab) });
+  for (const s of [-2, 0, 2, 4]) for (const t of [15, 25, 35, 45, 55]) filas.push({ s, t, r: simular({ ...v.pol, salario: s, tasa: t }, v.ab) });
   const tuya = { s: v.pol.salario, t: v.pol.tasa, r: simular(v.pol, v.ab), tuya: true };
   if (!filas.some(f => f.s === tuya.s && f.t === tuya.t)) filas.push(tuya);
   else filas.forEach(f => { if (f.s === tuya.s && f.t === tuya.t) f.tuya = true; });
   filas.sort((a, b) => a.r.brecha - b.r.brecha);
-  let h = "<tr><th>#</th><th>Salario real</th><th>Tasa real</th><th>Inflación</th><th>Tipo de cambio real</th><th>Actividad</th><th>Dolarización</th><th>Cuenta corriente</th><th>Brecha</th><th>Situación</th></tr>";
+  let h = "<tr><th>#</th><th>Salario real</th><th>Tasa nominal</th><th>Tasa real</th><th>Inflación</th><th>Tipo de cambio real</th><th>Actividad</th><th>Dolarización</th><th>Cuenta corriente</th><th>Brecha</th><th>Situación</th></tr>";
   filas.forEach((f, j) => {
     const x = f.r, sit = x.brecha <= 0 ? (x.actividad > 0.5 ? estado("bueno", "sostenible") : estado("alerta", "cierra con recesión")) : x.brecha < 5000 ? estado("alerta", "ajustada") : estado("critico", "no cierra");
-    h += `<tr${f.tuya ? ' class="actual"' : ""}><td>${j + 1}${f.tuya ? " · tu combinación" : ""}</td><td>${pct(f.s, true)}</td><td>${pct(f.t)}</td><td>${pct(x.infl)}</td><td>${pct(x.tcr, true)}</td><td>${pct(x.actividad, true)}</td><td>${usd(x.dolarizacion)}</td><td>${usd(x.cuentaCorriente)}</td><td>${x.brecha <= 0 ? "Cubierta" : usd(x.brecha)}</td><td style="text-align:left">${sit}</td></tr>`;
+    h += `<tr${f.tuya ? ' class="actual"' : ""}><td>${j + 1}${f.tuya ? " · tu combinación" : ""}</td><td>${pct(f.s, true)}</td><td>${fmt(f.t, 0)}%</td><td>${pct(x.tasaReal, true)}</td><td>${pct(x.infl)}</td><td>${pct(x.tcr, true)}</td><td>${pct(x.actividad, true)}</td><td>${usd(x.dolarizacion)}</td><td>${usd(x.cuentaCorriente)}</td><td>${x.brecha <= 0 ? "Cubierta" : usd(x.brecha)}</td><td style="text-align:left">${sit}</td></tr>`;
   });
   $("ranking").innerHTML = h;
 }
@@ -406,7 +406,8 @@ function tabla(ab) {
   for (const [k, e] of Object.entries(ESCENARIOS)) { res[k] = simular(e, ab); cie[k] = tasaDeCierre(e, ab); }
   const filas = [
     ["Salario real", k => pct(res[k].salarioReal, true)],
-    ["Tasa real", k => pct(ESCENARIOS[k].tasa)],
+    ["Tasa nominal", k => fmt(ESCENARIOS[k].tasa, 0) + "%"],
+    ["Tasa real", k => pct(res[k].tasaReal, true)],
     ["Inflación anual", k => pct(res[k].infl)],
     ["Consumo", k => pct(res[k].consumo, true)],
     ["Nivel de actividad", k => pct(res[k].actividad, true)],
@@ -415,7 +416,7 @@ function tabla(ab) {
     ["Dolarización", k => usd(res[k].dolarizacion)],
     ["Puentes usados", k => usd(res[k].puentes)],
     ["Brecha sin cubrir", k => res[k].brecha <= 0 ? "Cubierta" : usd(res[k].brecha)],
-    ["Tasa real que cierra la brecha", k => !cie[k].necesaria ? "No hace falta" : cie[k].tasa === null ? "Ninguna alcanza" : pct(cie[k].tasa), true],
+    ["Tasa nominal que cierra la brecha", k => !cie[k].necesaria ? "No hace falta" : cie[k].tasa === null ? "Ninguna alcanza" : fmt(cie[k].tasa, 0) + "%", true],
     ["Actividad con esa tasa", k => !cie[k].necesaria ? pct(res[k].actividad, true) : cie[k].tasa === null ? "—" : pct(cie[k].r.actividad, true)],
     ["Consumo con esa tasa", k => !cie[k].necesaria ? pct(res[k].consumo, true) : cie[k].tasa === null ? "—" : pct(cie[k].r.consumo, true)]
   ];

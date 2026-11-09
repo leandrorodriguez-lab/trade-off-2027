@@ -57,13 +57,14 @@ const PUENTES = {
   mercado:  { nombre: "Emisión en el mercado internacional", monto: 5000, condicional: true }
 };
 
-// pol = { salario, indexado, tasa (REAL, % anual), dev, puentes }   ab = indicadores abiertos
+// pol = { salario, indexado, tasa (NOMINAL, % anual), dev, puentes }   ab = indicadores abiertos
 function simular(pol, ab = ABIERTOS, p = PARAMS) {
   const d = (Math.pow(1 + pol.dev / 100, 12) - 1) * 100;
   const q = ab.productividad;
-  const r = pol.tasa;                                  // tasa real: instrumento del Banco Central
-  let infl = p.pautaInercial, b = 0, sal = pol.salario, w = p.pautaInercial + pol.salario;
-  for (let k = 0; k < 400; k++) {
+  const i = pol.tasa;                                  // tasa nominal: la que compite con el dólar
+  let infl = p.pautaInercial, b = 0, r = 0, sal = pol.salario, w = p.pautaInercial + pol.salario;
+  for (let k = 0; k < 600; k++) {
+    r = ((1 + i / 100) / (1 + infl / 100) - 1) * 100;
     b = Math.min(p.brechaMax, Math.max(p.brechaMin, -p.gamma * (r - p.tasaNeutral) + p.lambda * sal));
     let nueva;
     if (pol.indexado) {
@@ -76,7 +77,7 @@ function simular(pol, ab = ABIERTOS, p = PARAMS) {
     infl = 0.5 * infl + 0.5 * nueva;
     if (!pol.indexado) sal = ((1 + w / 100) / (1 + infl / 100) - 1) * 100;
   }
-  const tasaNominal = ((1 + r / 100) * (1 + infl / 100) - 1) * 100;
+  const tasaNominal = i;
   const salarioReal = pol.indexado ? pol.salario : sal;
   const credito = -p.gamma * (r - p.tasaNeutral);
   const consumo = 1.5 + 0.6 * salarioReal + 0.6 * credito;
@@ -105,21 +106,21 @@ function simular(pol, ab = ABIERTOS, p = PARAMS) {
            brechaCifra: p.amortizaciones + p.intereses - p.fuentesProbables };
 }
 
-// Tasa real mínima que cierra la brecha (con los puentes elegidos). null si ninguna alcanza hasta 40%.
+// Tasa nominal mínima que cierra la brecha (con los puentes elegidos). null si ninguna alcanza hasta 150%.
 function tasaDeCierre(pol, ab = ABIERTOS, p = PARAMS) {
   const r0 = simular(pol, ab, p);
   if (r0.brecha <= 0) return { necesaria: false, tasa: pol.tasa, r: r0 };
-  for (let i = Math.ceil(pol.tasa); i <= 40; i += 0.5) {
+  for (let i = Math.ceil(pol.tasa); i <= 150; i += 1) {
     const r = simular({ ...pol, tasa: i }, ab, p);
     if (r.brecha <= 0) return { necesaria: true, tasa: i, r };
   }
-  return { necesaria: true, tasa: null, r: simular({ ...pol, tasa: 40 }, ab, p) };
+  return { necesaria: true, tasa: null, r: simular({ ...pol, tasa: 150 }, ab, p) };
 }
 
 const ESCENARIOS = {
-  A: { nombre: "A. Dos motores con dólar planchado", salario: 3, indexado: true, tasa: 2, dev: 0.8, puentes: ["locales", "repo"] },
-  B: { nombre: "B. Corrección cambiaria", salario: 0, indexado: false, tasa: 10, dev: 2.5, puentes: ["locales", "repo"] },
-  C: { nombre: "C. Equilibrio precario", salario: 1, indexado: true, tasa: 14, dev: 1.2, puentes: ["caja", "locales", "repo", "swap", "mercado"] }
+  A: { nombre: "A. Dos motores con dólar planchado", salario: 3, indexado: true, tasa: 17, dev: 0.8, puentes: ["locales", "repo"] },
+  B: { nombre: "B. Corrección cambiaria", salario: 0, indexado: false, tasa: 35, dev: 2.5, puentes: ["locales", "repo"] },
+  C: { nombre: "C. Equilibrio precario", salario: 1, indexado: true, tasa: 30, dev: 1.2, puentes: ["caja", "locales", "repo", "swap", "mercado"] }
 };
 
 if (typeof module !== "undefined") module.exports = { simular, tasaDeCierre, PARAMS, ABIERTOS, PUENTES, ESCENARIOS };
