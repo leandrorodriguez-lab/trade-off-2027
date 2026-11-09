@@ -4,35 +4,38 @@ Simulador interactivo con fines didácticos (Política Económica, Facultad de C
 
 Página: https://leandrorodriguez-lab.github.io/trade-off-2027/
 
-## La idea
+## Enfoque (versión 4: variables nominales)
 
-El gobierno quiere reactivar con dos motores: **salarios por encima de la inflación** y **expansión del crédito**. Los dos empujan la inflación por costos y por demanda; para que no se espiralice hay que mantener bajo el tipo de cambio. El dólar barato estimula la dolarización del ahorro y achica el superávit de cuenta corriente, y sin crédito externo se hace difícil cubrir la brecha de 2027. Para cerrarla hay que subir la tasa y frenar el consumo: los motores se apagan. El equilibrio posible es precario.
+El gobierno elige tres variables nominales:
 
-## Supuestos
+- **Aumento salarial nominal** (mueve el consumo)
+- **Tipo de cambio** a diciembre de 2027
+- **Tasa de interés nominal** (sostiene el dólar y regula el crédito)
 
-- Sin acceso al mercado internacional de capitales; economía abierta; sin límites al atesoramiento de personas.
-- Superávit fiscal: el impulso de demanda no es fiscal.
-- Brecha de CIFRA (Informe de coyuntura N° 50): vencimientos de la Nación y del Banco Central por USD 30.100 M (capital 20.700 + intereses 9.400) menos fuentes probables por USD 7.400 M = USD 22.700 M.
-- Cuenta corriente 2027 con el tipo de cambio real actual: +0,6% del PBI (USD 4.533 M), con los intereses ya descontados. Por eso la brecha se mide con la balanza de pagos: `13.300 − cuenta corriente + dolarización − ingresos financieros − puentes`.
+Dos resultados son endógenos:
 
-## Ecuaciones principales
+- **Inflación**: sube con los salarios y con el tipo de cambio, baja con la tasa.
+- **Saldo en divisas del sector privado** (cuenta corriente − compras netas para atesoramiento): mejora con el tipo de cambio y con la tasa, empeora con los salarios.
 
-- Precios por costos: `π = α·d + (1 − α)·(w − q) + κ·b`
-- Con salarios indexados a una meta real: `π = d + [(1 − α)/α]·(ŵ − q) + (κ/α)·b` (la devaluación pasa entera a precios)
-- Tipo de cambio real: `ΔTCR ≈ π* − 1,5·(ŵ − q) − (κ/α)·b`
-- Cuenta corriente: `CC = 4.533 + β·ΔTCR − importaciones por consumo`
-- Dolarización: crece con la apreciación, con el salario real y con el salto esperado después de las elecciones; baja con el rendimiento de los pesos.
+La brecha a cubrir es `13.300 − saldo en divisas − ingresos financieros − puentes`, donde 13.300 = amortizaciones 2027 (20.700) − fuentes probables (7.400), según CIFRA (Informe de coyuntura N° 50).
 
-## Qué se puede manipular
+## Punto de partida (niveles actuales, noviembre de 2026)
 
-- Motores: salario real (con o sin indexación) y tasa de interés nominal (la que compite con el dólar); ritmo devaluatorio.
-- Indicadores abiertos: sensibilidad de la cuenta corriente al tipo de cambio real (β), ingresos financieros privados netos, productividad y prima de riesgo.
-- Puentes: saldo de caja de 2026, emisiones locales, repo, swap con Estados Unidos y emisión internacional (solo con prima baja).
-- La página calcula la tasa nominal que cierra la brecha y su efecto en la actividad, y ordena combinaciones de salario y tasa de más a menos sostenible.
+- Inflación esperada 2027: 22% anual; aumento salarial: 22%; tasa nominal: 24% (plazo fijo); dólar: $1.545 hoy y $1.620 a diciembre de 2027.
+- Cuenta corriente 2027: +USD 4.533 M (0,6% del PBI). Compras para atesoramiento al ritmo de 2026: USD 28.000 M.
+- Saldo en divisas: −USD 23.467 M. Brecha a cubrir: **USD 36.767 M**.
+
+## Respuestas manipulables
+
+- Inflación: puntos por punto de aumento salarial (0,5), de suba del tipo de cambio (0,3) y de suba de la tasa (−0,15).
+- Saldo en divisas: USD M por punto de suba del tipo de cambio (+1.200), de aumento salarial (−500) y de suba de la tasa (+600).
+- Ingresos financieros privados netos (0) y puentes de financiamiento.
+
+La página muestra cuánto habría que mover cada instrumento por sí solo para cerrar la brecha y con qué costo, y las curvas de consumo contra brecha e inflación.
 
 ## Archivos
 
 - `index.html`: la página.
-- `modelo.js`: ecuaciones y parámetros (`PARAMS`, `ABIERTOS`, `PUENTES`, `ESCENARIOS`).
+- `modelo.js`: ecuaciones, niveles de base (`BASE`), respuestas (`RESPUESTAS`), puentes y escenarios.
 
-Los parámetros de comportamiento son ilustrativos, no estimados econométricamente.
+Las respuestas iniciales son ilustrativas, no estimadas econométricamente.

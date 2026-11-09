@@ -1,126 +1,103 @@
-// Modelo estilizado del dilema de política económica 2027 (Argentina). Versión 3.
-// Fines didácticos: los parámetros de comportamiento son ilustrativos, no estimados.
-// Datos de la brecha: CIFRA, Informe de coyuntura N° 50 (octubre de 2026).
-// Tasas en % anual salvo el ritmo devaluatorio, que es mensual. Montos en millones de USD.
+// Modelo estilizado del dilema de política económica 2027 (Argentina). Versión 4: variables nominales.
+// Fines didácticos: las respuestas (coeficientes) son ilustrativas y se manipulan en la página.
 //
-// Supuestos: sin acceso al mercado internacional de capitales; economía abierta; sin límites
-// al atesoramiento de personas; superávit fiscal (el impulso de demanda no es fiscal).
-// El gobierno reactiva con dos motores: salario real por encima de la inflación y crédito (tasa baja).
+// Instrumentos que elige el gobierno: aumento del salario nominal, tipo de cambio a diciembre de 2027
+// y tasa de interés nominal. Endógenos: la inflación y el saldo en divisas del sector privado
+// (cuenta corriente − compras netas para atesoramiento).
+// Supuestos: sin acceso al mercado internacional de capitales; economía abierta; sin límites al
+// atesoramiento de personas; superávit fiscal (el impulso de demanda no es fiscal).
 
-const PARAMS = {
+const BASE = {
+  // Niveles actuales (noviembre de 2026) proyectados a 2027
+  salario: 22,          // aumento salarial nominal anual (%), en línea con la inflación esperada
+  tipoCambioHoy: 1545,  // dólar mayorista ($ por USD), noviembre de 2026
+  tipoCambio: 1620,     // dólar a diciembre de 2027 si sigue el ritmo de 2026 (+4,9%)
+  tasa: 24,             // tasa nominal anual de plazo fijo (%)
+  inflacion: 22,        // inflación anual esperada para 2027 (%), ≈1,7% mensual
+
+  // Saldo en divisas con los niveles actuales (millones de USD)
+  cuentaCorriente: 4533,   // 0,6% del PBI 2027, con los intereses ya descontados
+  atesoramiento: 28000,    // compras netas para atesoramiento al ritmo de 2026 (18.700 en ocho meses)
+
   // Programa financiero 2027 (CIFRA N° 50)
-  amortizaciones: 20700,    // capital: Nación 15.700 + Banco Central (bonos) 5.000
-  intereses: 9400,          // Nación 9.200 + Banco Central 200 (ya incluidos en la cuenta corriente)
-  fuentesProbables: 7400,   // organismos 4.100 + sector público 1.800 + privatizaciones 1.500
+  amortizaciones: 20700,   // Nación 15.700 + Banco Central (bonos) 5.000
+  fuentesProbables: 7400,  // organismos 4.100 + sector público 1.800 + privatizaciones 1.500
 
-  // Precios (formación por costos)
-  alfa: 0.4,          // peso de los transables en la canasta
-  kappa: 0.25,        // traslado de la presión de demanda a precios
-  piExt: 2.5,         // inflación internacional (%)
-  pautaInercial: 18,  // inflación de referencia para paritarias no indexadas (%)
-
-  // Demanda: crédito y salario
-  tasaNeutral: 5,     // tasa real neutral (%)
-  gamma: 0.3,         // sensibilidad de la demanda a la tasa real
-  lambda: 0.3,        // impulso del salario real sobre la demanda
-  brechaMin: -9, brechaMax: 5,
-  actividadBase: 0.5, // crecimiento sin impulsos (%)
-
-  // Cuenta corriente (total, con intereses)
-  ccBase: 4533,       // 0,6% del PBI 2027 al tipo de cambio real actual
-  efectoConsumo: 400, // importaciones: USD M por punto de consumo por encima del 1,5%
-
-  // Dolarización del ahorro (formación de activos externos)
-  dolarizacionBase: 24000,    // con tipo de cambio real actual, diferencial nulo y salario real constante
-  efectoApreciacion: 1500,    // USD M por punto de apreciación real (relación directa)
-  efectoDiferencial: 600,     // USD M por punto de diferencial pesos − dólares
-  efectoIngreso: 400,         // USD M por punto de salario real
-  saltoPorAtraso: 0.8,        // salto esperado post-electoral por punto de apreciación
-  saltoPorBrecha: 0.2,        // salto esperado por cada USD 1.000 M de brecha
-
-  primaMaxMercado: 9          // por encima de esta prima no hay emisión internacional
+  inflacionExt: 2.5        // inflación internacional (%), para el tipo de cambio real
 };
 
-// Indicadores abiertos (se manipulan en la página)
-const ABIERTOS = {
-  beta: 1130,          // USD M de cuenta corriente por punto de tipo de cambio real (0,15% del PBI)
-  ingresosFin: 0,      // ingresos financieros privados netos
-  productividad: 1,    // crecimiento de la productividad (%)
-  primaBase: 5         // riesgo país e incertidumbre (%)
+// Respuestas manipulables en la página
+const RESPUESTAS = {
+  inflSalario: 0.5,     // puntos de inflación por punto de aumento salarial
+  inflCambio: 0.3,      // puntos de inflación por punto de suba del tipo de cambio (traslado a precios)
+  inflTasa: 0.15,       // puntos de inflación que baja por punto de suba de la tasa
+  saldoCambio: 1200,    // USD M que mejora el saldo por punto de suba del tipo de cambio
+  saldoSalario: 500,    // USD M que empeora el saldo por punto de aumento salarial
+  saldoTasa: 600,       // USD M que mejora el saldo por punto de suba de la tasa
+  ingresosFin: 0        // ingresos financieros privados netos (USD M)
 };
+
+// Consumo (respuestas fijas, documentadas)
+const CONSUMO = { base: 1.0, porSalarioReal: 0.7, porTasa: 0.25 };   // crecimiento del consumo (%): sube con el salario real, baja con la tasa (crédito)
 
 const PUENTES = {
-  caja:     { nombre: "Saldo de caja de 2026", monto: 3700 },
-  locales:  { nombre: "Emisiones locales (Presupuesto)", monto: 1800 },
-  repo:     { nombre: "Repo con bancos internacionales", monto: 2000 },
-  swap:     { nombre: "Activación del swap con Estados Unidos", monto: 5000 },
-  mercado:  { nombre: "Emisión en el mercado internacional", monto: 5000, condicional: true }
+  caja:    { nombre: "Saldo de caja de 2026", monto: 3700 },
+  locales: { nombre: "Emisiones locales (Presupuesto)", monto: 1800 },
+  repo:    { nombre: "Repo con bancos internacionales", monto: 2000 },
+  swap:    { nombre: "Activación del swap con Estados Unidos", monto: 5000 }
 };
 
-// pol = { salario, indexado, tasa (NOMINAL, % anual), dev, puentes }   ab = indicadores abiertos
-function simular(pol, ab = ABIERTOS, p = PARAMS) {
-  const d = (Math.pow(1 + pol.dev / 100, 12) - 1) * 100;
-  const q = ab.productividad;
-  const i = pol.tasa;                                  // tasa nominal: la que compite con el dólar
-  let infl = p.pautaInercial, b = 0, r = 0, sal = pol.salario, w = p.pautaInercial + pol.salario;
-  for (let k = 0; k < 600; k++) {
-    r = ((1 + i / 100) / (1 + infl / 100) - 1) * 100;
-    b = Math.min(p.brechaMax, Math.max(p.brechaMin, -p.gamma * (r - p.tasaNeutral) + p.lambda * sal));
-    let nueva;
-    if (pol.indexado) {
-      // w = π + ŵ  ⇒  π = d + [(1−α)/α]·(ŵ − q) + (κ/α)·b
-      nueva = d + ((1 - p.alfa) / p.alfa) * (pol.salario - q) + (p.kappa / p.alfa) * b;
-    } else {
-      nueva = p.alfa * d + (1 - p.alfa) * (w - q) + p.kappa * b;   // paritaria nominal fija
-    }
-    if (Math.abs(nueva - infl) < 1e-10) { infl = nueva; break; }
-    infl = 0.5 * infl + 0.5 * nueva;
-    if (!pol.indexado) sal = ((1 + w / 100) / (1 + infl / 100) - 1) * 100;
-  }
-  const tasaNominal = i;
-  const salarioReal = pol.indexado ? pol.salario : sal;
-  const credito = -p.gamma * (r - p.tasaNeutral);
-  const consumo = 1.5 + 0.6 * salarioReal + 0.6 * credito;
-  const actividad = p.actividadBase + b;
-  const tcr = ((1 + d / 100) * (1 + p.piExt / 100) / (1 + infl / 100) - 1) * 100;
-  const rendDolares = ((1 + tasaNominal / 100) / (1 + d / 100) - 1) * 100;
-  const cc = p.ccBase + ab.beta * tcr - p.efectoConsumo * (consumo - 1.5);
-  const necesidadBruta = p.amortizaciones - p.fuentesProbables;     // 13.300
+function variacionCambio(tc, b = BASE) { return (tc / b.tipoCambioHoy - 1) * 100; }
 
-  let brecha = necesidadBruta - cc, salto = 0, prima = 0, dif = 0, dol = 0, puentes = 0, intl = true;
-  for (let k = 0; k < 500; k++) {
-    salto = Math.max(0, p.saltoPorAtraso * (-tcr) + p.saltoPorBrecha * Math.max(0, brecha) / 1000);
-    prima = ab.primaBase + salto;
-    dif = rendDolares - prima;
-    dol = Math.max(0, p.dolarizacionBase + p.efectoApreciacion * (-tcr) - p.efectoDiferencial * dif + p.efectoIngreso * salarioReal);
-    intl = prima <= p.primaMaxMercado;
-    puentes = 0;
-    for (const key of pol.puentes) { const x = PUENTES[key]; if (x.condicional && !intl) continue; puentes += x.monto; }
-    const nueva = necesidadBruta - puentes - cc + dol - ab.ingresosFin;
-    if (Math.abs(nueva - brecha) < 1e-6) { brecha = nueva; break; }
-    brecha = 0.5 * brecha + 0.5 * nueva;
-  }
-  return { devAnual: d, infl, tasaReal: r, tasaNominal, demanda: b, credito, salarioReal, consumo, actividad, tcr,
-           rendDolares, cuentaCorriente: cc, salto, prima, diferencial: dif, dolarizacion: dol,
-           puentes, mercadoIntlDisponible: intl, necesidadBruta, brecha,
-           brechaCifra: p.amortizaciones + p.intereses - p.fuentesProbables };
+// pol = { salario, tipoCambio, tasa, puentes }   resp = respuestas
+function simular(pol, resp = RESPUESTAS, b = BASE) {
+  const dw = pol.salario - b.salario;
+  const devaluacion = variacionCambio(pol.tipoCambio, b);
+  const de = devaluacion - variacionCambio(b.tipoCambio, b);
+  const di = pol.tasa - b.tasa;
+
+  const inflacion = b.inflacion + resp.inflSalario * dw + resp.inflCambio * de - resp.inflTasa * di;
+  const salarioReal = ((1 + pol.salario / 100) / (1 + inflacion / 100) - 1) * 100;
+  const tcr = ((1 + devaluacion / 100) * (1 + b.inflacionExt / 100) / (1 + inflacion / 100) - 1) * 100;
+  const rendDolares = ((1 + pol.tasa / 100) / (1 + devaluacion / 100) - 1) * 100;
+  const consumo = CONSUMO.base + CONSUMO.porSalarioReal * salarioReal - CONSUMO.porTasa * di;
+
+  const saldoBase = b.cuentaCorriente - b.atesoramiento;
+  const saldo = saldoBase + resp.saldoCambio * de - resp.saldoSalario * dw + resp.saldoTasa * di;
+  let puentes = 0;
+  for (const k of pol.puentes) puentes += PUENTES[k].monto;
+  const necesidad = b.amortizaciones - b.fuentesProbables;              // 13.300
+  const brecha = necesidad - saldo - resp.ingresosFin - puentes;
+
+  return { devaluacion, inflacion, salarioReal, tcr, rendDolares, consumo, saldoBase, saldo,
+           puentes, necesidad, brecha };
 }
 
-// Tasa nominal mínima que cierra la brecha (con los puentes elegidos). null si ninguna alcanza hasta 150%.
-function tasaDeCierre(pol, ab = ABIERTOS, p = PARAMS) {
-  const r0 = simular(pol, ab, p);
-  if (r0.brecha <= 0) return { necesaria: false, tasa: pol.tasa, r: r0 };
-  for (let i = Math.ceil(pol.tasa); i <= 150; i += 1) {
-    const r = simular({ ...pol, tasa: i }, ab, p);
-    if (r.brecha <= 0) return { necesaria: true, tasa: i, r };
-  }
-  return { necesaria: true, tasa: null, r: simular({ ...pol, tasa: 150 }, ab, p) };
+// Valor de un solo instrumento que cierra la brecha (los otros dos quedan fijos).
+function cierreConUnInstrumento(pol, resp = RESPUESTAS, b = BASE) {
+  const r0 = simular(pol, resp, b);
+  const out = {};
+  const B = r0.brecha;
+  // salario: el saldo empeora con salarios ⇒ hay que bajar el aumento salarial
+  out.salario = resp.saldoSalario > 0 ? pol.salario - B / resp.saldoSalario : null;
+  // tipo de cambio: puntos de variación adicionales
+  if (resp.saldoCambio > 0) {
+    const nuevaVar = r0.devaluacion + B / resp.saldoCambio;
+    out.tipoCambio = b.tipoCambioHoy * (1 + nuevaVar / 100);
+  } else out.tipoCambio = null;
+  out.tasa = resp.saldoTasa > 0 ? pol.tasa + B / resp.saldoTasa : null;
+  const res = {};
+  if (out.salario !== null) res.salario = { valor: out.salario, r: simular({ ...pol, salario: out.salario }, resp, b) };
+  if (out.tipoCambio !== null) res.tipoCambio = { valor: out.tipoCambio, r: simular({ ...pol, tipoCambio: out.tipoCambio }, resp, b) };
+  if (out.tasa !== null) res.tasa = { valor: out.tasa, r: simular({ ...pol, tasa: out.tasa }, resp, b) };
+  return { brecha: B, res };
 }
 
 const ESCENARIOS = {
-  A: { nombre: "A. Dos motores con dólar planchado", salario: 3, indexado: true, tasa: 17, dev: 0.8, puentes: ["locales", "repo"] },
-  B: { nombre: "B. Corrección cambiaria", salario: 0, indexado: false, tasa: 35, dev: 2.5, puentes: ["locales", "repo"] },
-  C: { nombre: "C. Equilibrio precario", salario: 1, indexado: true, tasa: 30, dev: 1.2, puentes: ["caja", "locales", "repo", "swap", "mercado"] }
+  H: { nombre: "Niveles actuales", salario: 22, tipoCambio: 1620, tasa: 24, puentes: [] },
+  A: { nombre: "A. Consumo con dólar planchado", salario: 30, tipoCambio: 1600, tasa: 20, puentes: ["locales", "repo"] },
+  B: { nombre: "B. Corrección cambiaria", salario: 22, tipoCambio: 2100, tasa: 30, puentes: ["locales", "repo"] },
+  C: { nombre: "C. Ajuste con tasa", salario: 22, tipoCambio: 1700, tasa: 50, puentes: ["caja", "locales", "repo", "swap"] }
 };
 
-if (typeof module !== "undefined") module.exports = { simular, tasaDeCierre, PARAMS, ABIERTOS, PUENTES, ESCENARIOS };
+if (typeof module !== "undefined") module.exports = { simular, cierreConUnInstrumento, variacionCambio, BASE, RESPUESTAS, CONSUMO, PUENTES, ESCENARIOS };
