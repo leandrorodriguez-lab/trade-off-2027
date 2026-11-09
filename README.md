@@ -6,32 +6,33 @@ Página: https://leandrorodriguez-lab.github.io/trade-off-2027/
 
 ## La idea
 
-Con superávit fiscal como ancla, apertura externa y casi sin crédito externo, el gobierno busca bajar la inflación y recuperar el consumo con un dólar apreciado antes de las elecciones de 2027. Pero el programa financiero tiene una **brecha de USD 22.700 millones** sin cubrir (CIFRA, Informe de coyuntura N° 50). El simulador muestra el circuito:
+El gobierno quiere reactivar con dos motores: **salarios por encima de la inflación** y **expansión del crédito**. Los dos empujan la inflación por costos y por demanda; para que no se espiralice hay que mantener bajo el tipo de cambio. El dólar barato estimula la dolarización del ahorro y achica el superávit de cuenta corriente, y sin crédito externo se hace difícil cubrir la brecha de 2027. Para cerrarla hay que subir la tasa y frenar el consumo: los motores se apagan. El equilibrio posible es precario.
 
-1. Expansión con apreciación cambiaria.
-2. Expectativa de devaluación después de octubre, alimentada por el atraso y por la brecha sin cubrir.
-3. Dolarización previa a las elecciones, que agranda la brecha.
-4. Suba de la tasa para contener al dólar, que vuelve a llevar a la recesión.
+## Supuestos
 
-El equilibrio que puede lograr el gobierno es precario: la brecha solo cierra con todos los puentes de financiamiento, con la actividad estancada y mientras la prima de riesgo no suba.
+- Sin acceso al mercado internacional de capitales; economía abierta; sin límites al atesoramiento de personas.
+- Superávit fiscal: el impulso de demanda no es fiscal.
+- Brecha de CIFRA (Informe de coyuntura N° 50): vencimientos de la Nación y del Banco Central por USD 30.100 M (capital 20.700 + intereses 9.400) menos fuentes probables por USD 7.400 M = USD 22.700 M.
+- Cuenta corriente 2027 con el tipo de cambio real actual: +0,6% del PBI (USD 4.533 M), con los intereses ya descontados. Por eso la brecha se mide con la balanza de pagos: `13.300 − cuenta corriente + dolarización − ingresos financieros − puentes`.
 
-## Qué se puede hacer
+## Ecuaciones principales
 
-- Elegir un escenario: **A. Expansión con apreciación**, **B. Corrección anticipada** o **C. Equilibrio precario**.
-- Mover la tasa de interés, el ritmo devaluatorio mensual y la prima de riesgo.
-- Activar puentes: saldo de caja de 2026, emisiones locales, repo, swap con Estados Unidos y emisión internacional (esta última solo si la prima de riesgo lo permite).
-- Ver la tasa necesaria para contener al dólar y la recesión que provoca, y aplicarla con un botón.
+- Precios por costos: `π = α·d + (1 − α)·(w − q) + κ·b`
+- Con salarios indexados a una meta real: `π = d + [(1 − α)/α]·(ŵ − q) + (κ/α)·b` (la devaluación pasa entera a precios)
+- Tipo de cambio real: `ΔTCR ≈ π* − 1,5·(ŵ − q) − (κ/α)·b`
+- Cuenta corriente: `CC = 4.533 + β·ΔTCR − importaciones por consumo`
+- Dolarización: crece con la apreciación, con el salario real y con el salto esperado después de las elecciones; baja con el rendimiento de los pesos.
+
+## Qué se puede manipular
+
+- Motores: salario real (con o sin indexación) y tasa de interés real; ritmo devaluatorio.
+- Indicadores abiertos: sensibilidad de la cuenta corriente al tipo de cambio real (β), ingresos financieros privados netos, productividad y prima de riesgo.
+- Puentes: saldo de caja de 2026, emisiones locales, repo, swap con Estados Unidos y emisión internacional (solo con prima baja).
+- La página calcula la tasa real que cierra la brecha y su efecto en la actividad, y ordena combinaciones de salario y tasa de más a menos sostenible.
 
 ## Archivos
 
 - `index.html`: la página.
-- `modelo.js`: las ecuaciones y los parámetros. Para cambiar supuestos, editar el objeto `PARAMS`.
-
-## Datos (CIFRA N° 50, octubre de 2026)
-
-- Vencimientos 2027 del gobierno nacional: USD 24.900 M; Bonos para la Reconstrucción de una Argentina Libre del Banco Central: USD 5.200 M. Total: USD 30.100 M.
-- Fuentes probables: USD 7.400 M (organismos 4.100, renovación dentro del sector público 1.800, privatizaciones 1.500).
-- Brecha: USD 22.700 M. Con provincias (2.400) y obligaciones negociables de empresas (8.200), los vencimientos totales suman USD 40.700 M.
-- Dolarización (formación de activos externos) en 2026: USD 18.700 M en ocho meses.
+- `modelo.js`: ecuaciones y parámetros (`PARAMS`, `ABIERTOS`, `PUENTES`, `ESCENARIOS`).
 
 Los parámetros de comportamiento son ilustrativos, no estimados econométricamente.
