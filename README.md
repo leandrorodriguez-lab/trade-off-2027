@@ -38,6 +38,6 @@ La página muestra cuánto habría que mover cada instrumento por sí solo para 
 ## Archivos
 
 - `index.html`: la página.
-- `modelo.js`: ecuaciones, niveles de base (`BASE`), respuestas (`RESPUESTAS`), puentes y escenarios.
+- `modelo.js`: ecuaciones, niveles de base (`BASE`), respuestas (`RESPUESTAS`), otras fuentes de financiamiento (`PUENTES`) y escenarios.
 
 Las respuestas iniciales son ilustrativas, no estimadas econométricamente.
