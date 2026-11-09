@@ -115,7 +115,7 @@
       <div class="control">
         <label for="tasa">Tasa de interés nominal anual <output id="o-tasa"></output></label>
         <input type="range" id="tasa" min="5" max="100" step="1">
-        <div class="ayuda">Nivel actual: 24%. Sostiene el dólar y baja la inflación.</div>
+        <div class="ayuda">Nivel actual: 24%. Sostiene el dólar y baja la inflación, pero frena el crédito y el consumo.</div>
       </div>
 
       <details class="bloque" open>
@@ -166,6 +166,11 @@
           <div class="ayuda">Masa salarial real = salario real + empleo.</div>
         </div>
         <div class="control">
+          <label for="r-ct">Si la tasa sube 1 punto, el consumo cae <output id="o-ct"></output></label>
+          <input type="range" id="r-ct" min="0" max="0.6" step="0.01">
+          <div class="ayuda">Canal del crédito: con tasa más alta se financia menos consumo.</div>
+        </div>
+        <div class="control">
           <label for="r-em">Variación del empleo <output id="o-em"></output></label>
           <input type="range" id="r-em" min="-5" max="5" step="0.5">
           <div class="ayuda">Supuesto inicial: empleo estable.</div>
@@ -173,7 +178,7 @@
         <div class="control">
           <label for="r-et">Si la tasa sube 1 punto, el empleo cae <output id="o-et"></output></label>
           <input type="range" id="r-et" min="0" max="0.3" step="0.01">
-          <div class="ayuda">Arranca en cero (empleo estable). Subilo para que la tasa tenga costo en empleo vía crédito e inversión.</div>
+          <div class="ayuda">Arranca en cero (empleo estable). Subilo si querés que la tasa también afecte el empleo.</div>
         </div>
       </details>
 
@@ -226,7 +231,7 @@
       </div>
       <div class="tarjeta">
         <h2>Consumo contra inflación</h2>
-        <p class="sub chico">Las mismas curvas. Más salario sube el consumo y la inflación; más tipo de cambio sube la inflación y baja el consumo. Más tasa baja la inflación: con empleo estable eso sube el salario real y el consumo; si el empleo responde a la tasa, el consumo cae.</p>
+        <p class="sub chico">Las mismas curvas. Más salario sube el consumo y la inflación; más tipo de cambio sube la inflación y baja el consumo. Más tasa baja la inflación y mejora el salario real, pero frena el crédito: el consumo cae si el canal del crédito pesa más que la mejora salarial.</p>
         <div class="graf"><canvas id="g2" aria-label="Consumo contra inflación según cada instrumento"></canvas></div>
       </div>
     </div>
@@ -247,7 +252,7 @@
         <li>Saldo en divisas: <span class="formula">S = (4.533 − 28.000) + c_e·(e − e₀) − c_w·(w − w₀) + c_i·(i − i₀)</span></li>
         <li>Brecha: <span class="formula">13.300 − S − ingresos financieros − puentes</span></li>
         <li>Salario real: <span class="formula">(1 + w)/(1 + π) − 1</span>; tipo de cambio real: <span class="formula">(1 + e)(1 + 2,5%)/(1 + π) − 1</span></li>
-        <li>Consumo: <span class="formula">c·masa salarial real</span>, con masa salarial real = salario real + empleo y <span class="formula">empleo = empleo exógeno − b·(i − i₀)</span>. Supuesto inicial: empleo estable (b = 0).</li>
+        <li>Consumo: <span class="formula">c·masa salarial real − k·(i − i₀)</span>, con masa salarial real = salario real + empleo. El segundo término es el canal del crédito. Supuesto inicial: empleo estable; opcionalmente, <span class="formula">empleo = empleo exógeno − b·(i − i₀)</span>.</li>
         <li>Rendimiento de los pesos en dólares: <span class="formula">(1 + i)/(1 + e) − 1</span></li>
       </ul>
       <p class="ayuda">Modelo lineal con fines didácticos. Las respuestas iniciales son ilustrativas, no estimadas econométricamente; están en <code>modelo.js</code> y se pueden cambiar desde la página.</p>
@@ -274,7 +279,7 @@ for (const [k, p] of Object.entries(PUENTES)) {
   contPuentes.appendChild(l);
 }
 const RESP_INI = { ...RESPUESTAS };
-const mapaResp = { "r-iw": "inflSalario", "r-ie": "inflCambio", "r-ii": "inflTasa", "r-se": "saldoCambio", "r-sw": "saldoSalario", "r-si": "saldoTasa", "r-if": "ingresosFin", "r-cm": "consumoMasa", "r-em": "empleo", "r-et": "empleoTasa" };
+const mapaResp = { "r-iw": "inflSalario", "r-ie": "inflCambio", "r-ii": "inflTasa", "r-se": "saldoCambio", "r-sw": "saldoSalario", "r-si": "saldoTasa", "r-if": "ingresosFin", "r-cm": "consumoMasa", "r-ct": "consumoTasa", "r-em": "empleo", "r-et": "empleoTasa" };
 function cargarRespuestas(r) { for (const [id, k] of Object.entries(mapaResp)) $(id).value = r[k]; }
 
 function estado(nivel, texto) {
@@ -346,6 +351,7 @@ function actualizar() {
   $("o-si").textContent = usd(v.resp.saldoTasa);
   $("o-if").textContent = usd(v.resp.ingresosFin);
   $("o-cm").textContent = fmt(v.resp.consumoMasa, 2) + " puntos";
+  $("o-ct").textContent = fmt(v.resp.consumoTasa, 2) + " puntos";
   $("o-em").textContent = pct(v.resp.empleo, true);
   $("o-et").textContent = fmt(v.resp.empleoTasa, 2) + " puntos";
 

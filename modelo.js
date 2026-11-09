@@ -36,6 +36,7 @@ const RESPUESTAS = {
   saldoTasa: 600,       // USD M que mejora el saldo por punto de suba de la tasa
   ingresosFin: 0,       // ingresos financieros privados netos (USD M)
   consumoMasa: 0.7,     // puntos de consumo por punto de masa salarial real (salario real + empleo)
+  consumoTasa: 0.2,     // puntos de consumo que caen por punto de suba de la tasa (menos crédito)
   empleo: 0,            // variación del empleo (%), que suponemos estable
   empleoTasa: 0         // puntos de empleo que caen por punto de suba de la tasa (0 = empleo estable)
 };
@@ -61,10 +62,10 @@ function simular(pol, resp = RESPUESTAS, b = BASE) {
   const salarioReal = ((1 + pol.salario / 100) / (1 + inflacion / 100) - 1) * 100;
   const tcr = ((1 + devaluacion / 100) * (1 + b.inflacionExt / 100) / (1 + inflacion / 100) - 1) * 100;
   const rendDolares = ((1 + pol.tasa / 100) / (1 + devaluacion / 100) - 1) * 100;
-  // Consumo: función de la masa salarial real (salario real y nivel de empleo)
+  // Consumo: función de la masa salarial real (salario real y empleo) y del crédito (baja con la tasa)
   const empleo = resp.empleo - resp.empleoTasa * di;
   const masaSalarial = ((1 + salarioReal / 100) * (1 + empleo / 100) - 1) * 100;
-  const consumo = resp.consumoMasa * masaSalarial;
+  const consumo = resp.consumoMasa * masaSalarial - resp.consumoTasa * di;
 
   const saldoBase = b.cuentaCorriente - b.atesoramiento;
   const saldo = saldoBase + resp.saldoCambio * de - resp.saldoSalario * dw + resp.saldoTasa * di;
