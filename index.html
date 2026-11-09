@@ -82,7 +82,7 @@
 <main>
   <header>
     <h1>El dilema de la política económica en 2027</h1>
-    <p class="sub">El gobierno elige tres variables nominales: el aumento de los salarios (que mueve el consumo), el tipo de cambio y la tasa de interés. La inflación responde: sube con los salarios y con el tipo de cambio, y baja con la tasa. El saldo de divisas del sector privado (cuenta corriente menos compras para atesoramiento) también responde: mejora con el tipo de cambio y con la tasa, y empeora con los salarios. Con esos dos resultados se ve si alcanzan los dólares para 2027 sin crédito externo, y a costa de qué.</p>
+    <p class="sub">El gobierno elige tres variables nominales: el aumento de los salarios (el consumo sigue a la masa salarial real), el tipo de cambio y la tasa de interés. La inflación responde: sube con los salarios y con el tipo de cambio, y baja con la tasa. El saldo de divisas del sector privado (cuenta corriente menos compras para atesoramiento) también responde: mejora con el tipo de cambio y con la tasa, y empeora con los salarios. Con esos dos resultados se ve si alcanzan los dólares para 2027 sin crédito externo, y a costa de qué.</p>
   </header>
 
   <section class="grilla g4">
@@ -105,7 +105,7 @@
       <div class="control" style="margin-top:14px">
         <label for="salario">Aumento salarial nominal 2027 <output id="o-salario"></output></label>
         <input type="range" id="salario" min="0" max="50" step="1">
-        <div class="ayuda">Nivel actual: 22%. Mueve el consumo.</div>
+        <div class="ayuda">Nivel actual: 22%. El consumo sigue al salario real.</div>
       </div>
       <div class="control">
         <label for="tc">Tipo de cambio a diciembre de 2027 <output id="o-tc"></output></label>
@@ -115,7 +115,7 @@
       <div class="control">
         <label for="tasa">Tasa de interés nominal anual <output id="o-tasa"></output></label>
         <input type="range" id="tasa" min="5" max="100" step="1">
-        <div class="ayuda">Nivel actual: 24%. Sostiene el dólar y frena el crédito y el consumo.</div>
+        <div class="ayuda">Nivel actual: 24%. Sostiene el dólar y baja la inflación.</div>
       </div>
 
       <details class="bloque" open>
@@ -159,6 +159,25 @@
       </details>
 
       <details class="bloque" open>
+        <summary>Respuestas del consumo</summary>
+        <div class="control">
+          <label for="r-cm">Si la masa salarial real sube 1 punto, el consumo sube <output id="o-cm"></output></label>
+          <input type="range" id="r-cm" min="0" max="1.5" step="0.05">
+          <div class="ayuda">Masa salarial real = salario real + empleo.</div>
+        </div>
+        <div class="control">
+          <label for="r-em">Variación del empleo <output id="o-em"></output></label>
+          <input type="range" id="r-em" min="-5" max="5" step="0.5">
+          <div class="ayuda">Supuesto inicial: empleo estable.</div>
+        </div>
+        <div class="control">
+          <label for="r-et">Si la tasa sube 1 punto, el empleo cae <output id="o-et"></output></label>
+          <input type="range" id="r-et" min="0" max="0.3" step="0.01">
+          <div class="ayuda">Arranca en cero (empleo estable). Subilo para que la tasa tenga costo en empleo vía crédito e inversión.</div>
+        </div>
+      </details>
+
+      <details class="bloque" open>
         <summary>Puentes para cubrir la brecha</summary>
         <div class="puentes" id="puentes"></div>
       </details>
@@ -171,6 +190,7 @@
           <h3>Objetivos</h3>
           <div class="metrica"><div class="nombre">Inflación anual</div><div class="valor" id="m-infl"></div></div>
           <div class="metrica"><div class="nombre">Salario real</div><div class="valor" id="m-sal"></div></div>
+          <div class="metrica"><div class="nombre">Empleo</div><div class="valor" id="m-emp"></div></div>
           <div class="metrica"><div class="nombre">Consumo</div><div class="valor" id="m-cons"></div></div>
         </div>
         <div class="tarjeta">
@@ -206,7 +226,7 @@
       </div>
       <div class="tarjeta">
         <h2>Consumo contra inflación</h2>
-        <p class="sub chico">Las mismas curvas. Más salario sube el consumo y la inflación; más tipo de cambio sube la inflación y baja el consumo; más tasa baja las dos.</p>
+        <p class="sub chico">Las mismas curvas. Más salario sube el consumo y la inflación; más tipo de cambio sube la inflación y baja el consumo. Más tasa baja la inflación: con empleo estable eso sube el salario real y el consumo; si el empleo responde a la tasa, el consumo cae.</p>
         <div class="graf"><canvas id="g2" aria-label="Consumo contra inflación según cada instrumento"></canvas></div>
       </div>
     </div>
@@ -227,7 +247,7 @@
         <li>Saldo en divisas: <span class="formula">S = (4.533 − 28.000) + c_e·(e − e₀) − c_w·(w − w₀) + c_i·(i − i₀)</span></li>
         <li>Brecha: <span class="formula">13.300 − S − ingresos financieros − puentes</span></li>
         <li>Salario real: <span class="formula">(1 + w)/(1 + π) − 1</span>; tipo de cambio real: <span class="formula">(1 + e)(1 + 2,5%)/(1 + π) − 1</span></li>
-        <li>Consumo: <span class="formula">1% + 0,7·salario real − 0,25·(i − i₀)</span>. Sube con el salario real y baja con la tasa por el crédito.</li>
+        <li>Consumo: <span class="formula">c·masa salarial real</span>, con masa salarial real = salario real + empleo y <span class="formula">empleo = empleo exógeno − b·(i − i₀)</span>. Supuesto inicial: empleo estable (b = 0).</li>
         <li>Rendimiento de los pesos en dólares: <span class="formula">(1 + i)/(1 + e) − 1</span></li>
       </ul>
       <p class="ayuda">Modelo lineal con fines didácticos. Las respuestas iniciales son ilustrativas, no estimadas econométricamente; están en <code>modelo.js</code> y se pueden cambiar desde la página.</p>
@@ -254,7 +274,7 @@ for (const [k, p] of Object.entries(PUENTES)) {
   contPuentes.appendChild(l);
 }
 const RESP_INI = { ...RESPUESTAS };
-const mapaResp = { "r-iw": "inflSalario", "r-ie": "inflCambio", "r-ii": "inflTasa", "r-se": "saldoCambio", "r-sw": "saldoSalario", "r-si": "saldoTasa", "r-if": "ingresosFin" };
+const mapaResp = { "r-iw": "inflSalario", "r-ie": "inflCambio", "r-ii": "inflTasa", "r-se": "saldoCambio", "r-sw": "saldoSalario", "r-si": "saldoTasa", "r-if": "ingresosFin", "r-cm": "consumoMasa", "r-em": "empleo", "r-et": "empleoTasa" };
 function cargarRespuestas(r) { for (const [id, k] of Object.entries(mapaResp)) $(id).value = r[k]; }
 
 function estado(nivel, texto) {
@@ -325,10 +345,14 @@ function actualizar() {
   $("o-sw").textContent = usd(v.resp.saldoSalario);
   $("o-si").textContent = usd(v.resp.saldoTasa);
   $("o-if").textContent = usd(v.resp.ingresosFin);
+  $("o-cm").textContent = fmt(v.resp.consumoMasa, 2) + " puntos";
+  $("o-em").textContent = pct(v.resp.empleo, true);
+  $("o-et").textContent = fmt(v.resp.empleoTasa, 2) + " puntos";
 
   $("m-infl").innerHTML = pct(r.inflacion) + (r.inflacion <= 18 ? estado("bueno", "baja") : r.inflacion <= 26 ? estado("alerta", "como hoy") : estado("critico", "se acelera"));
   $("m-sal").innerHTML = pct(r.salarioReal, true) + (r.salarioReal > 0.5 ? estado("bueno", "mejora") : r.salarioReal > -0.5 ? estado("alerta", "estancado") : estado("critico", "cae"));
-  $("m-cons").innerHTML = pct(r.consumo, true) + (r.consumo > 2 ? estado("bueno", "crece") : r.consumo > 0 ? estado("alerta", "débil") : estado("critico", "cae"));
+  $("m-emp").innerHTML = pct(r.empleo, true) + (r.empleo > 0.2 ? estado("bueno", "crece") : r.empleo > -0.2 ? estado("alerta", "estable") : estado("critico", "cae"));
+  $("m-cons").innerHTML = pct(r.consumo, true) + (r.consumo > 1.5 ? estado("bueno", "crece") : r.consumo > -0.5 ? estado("alerta", "estancado") : estado("critico", "cae"));
   $("m-dev").textContent = pct(r.devaluacion, true);
   $("m-tcr").innerHTML = pct(r.tcr, true) + (r.tcr < -3 ? estado("critico", "se aprecia") : r.tcr < 2 ? estado("alerta", "estable") : estado("bueno", "se deprecia"));
   $("m-rend").textContent = pct(r.rendDolares, true);
@@ -338,25 +362,25 @@ function actualizar() {
 
   // lectura
   let t;
-  if (r.brecha <= 0 && r.consumo > 1 && r.inflacion <= 22) t = `La brecha se cubre con consumo creciendo ${pct(r.consumo)} e inflación de ${pct(r.inflacion)}. Revisá qué respuestas lo hacen posible: con respuestas menos favorables, este equilibrio se rompe.`;
+  if (r.brecha <= 0 && r.consumo > 0.5 && r.inflacion <= 22 && r.empleo > -0.5) t = `La brecha se cubre con consumo creciendo ${pct(r.consumo)} e inflación de ${pct(r.inflacion)}. Revisá qué respuestas lo hacen posible: con respuestas menos favorables, este equilibrio se rompe.`;
   else if (r.brecha <= 0) t = `La brecha se cubre, pero el costo es ${r.consumo <= 0 ? "un consumo que cae " + pct(r.consumo, true) : "un consumo que apenas crece " + pct(r.consumo, true)}` + (r.inflacion > 22 ? ` y una inflación que sube a ${pct(r.inflacion)}` : "") + (r.salarioReal < 0 ? `, con el salario real en ${pct(r.salarioReal, true)}` : "") + ".";
-  else t = `Faltan ${usd(r.brecha)}. ` + (r.consumo > 1 ? `El consumo crece ${pct(r.consumo)}, pero el tipo de cambio real ${r.tcr < 0 ? "se aprecia " + pct(-r.tcr) : "apenas se mueve"} y el saldo en divisas queda en ${usd(r.saldo)}.` : `Aun con el consumo en ${pct(r.consumo, true)}, el saldo en divisas no alcanza (${usd(r.saldo)}).`) + " Mirá abajo cuánto habría que mover cada instrumento para cerrarla.";
+  else t = `Faltan ${usd(r.brecha)}. ` + (r.consumo > 0.5 ? `El consumo crece ${pct(r.consumo)}, pero el tipo de cambio real ${r.tcr < 0 ? "se aprecia " + pct(-r.tcr) : "apenas se mueve"} y el saldo en divisas queda en ${usd(r.saldo)}.` : `Aun con el consumo en ${pct(r.consumo, true)}, el saldo en divisas no alcanza (${usd(r.saldo)}).`) + " Mirá abajo cuánto habría que mover cada instrumento para cerrarla.";
   $("lectura").textContent = t;
 
   // cierre con un instrumento
   const c = cierreConUnInstrumento(v.pol, v.resp);
-  let h = "<tr><th>Instrumento</th><th>Valor actual</th><th>Valor que cierra la brecha</th><th>Inflación</th><th>Salario real</th><th>Consumo</th><th>¿Es viable?</th></tr>";
-  if (r.brecha <= 0) h += `<tr><td colspan="7">La brecha ya está cubierta con tu combinación.</td></tr>`;
+  let h = "<tr><th>Instrumento</th><th>Valor actual</th><th>Valor que cierra la brecha</th><th>Inflación</th><th>Salario real</th><th>Empleo</th><th>Consumo</th><th>Rendimiento pesos en USD</th><th>¿Es viable?</th></tr>";
+  if (r.brecha <= 0) h += `<tr><td colspan="9">La brecha ya está cubierta con tu combinación.</td></tr>`;
   else {
     const filas = [["salario", "Aumento salarial", fmt(v.pol.salario, 0) + "%", x => fmt(x, 0) + "%", x => x >= 0, "exige recortar salarios nominales"],
                    ["tipoCambio", "Tipo de cambio dic-2027", pesos(v.pol.tipoCambio), x => pesos(x) + " (" + pct((x / BASE.tipoCambioHoy - 1) * 100, true) + ")", x => x <= 2800, "fuera del rango"],
                    ["tasa", "Tasa nominal", fmt(v.pol.tasa, 0) + "%", x => fmt(x, 0) + "%", x => x <= 100, "más de 100%"]];
     for (const [k, nom, act, f, ok, motivo] of filas) {
       const x = c.res[k];
-      if (!x) { h += `<tr><td>${nom}</td><td>${act}</td><td colspan="5">Con respuesta nula, este instrumento no mueve el saldo.</td></tr>`; continue; }
+      if (!x) { h += `<tr><td>${nom}</td><td>${act}</td><td colspan="7">Con respuesta nula, este instrumento no mueve el saldo.</td></tr>`; continue; }
       const viable = ok(x.valor) && x.r.consumo > -3 && x.r.inflacion < 40;
       const por = !ok(x.valor) ? motivo : x.r.consumo <= -3 ? "hunde el consumo" : x.r.inflacion >= 40 ? "dispara la inflación" : "";
-      h += `<tr><td>${nom}</td><td>${act}</td><td>${f(x.valor)}</td><td>${pct(x.r.inflacion)}</td><td>${pct(x.r.salarioReal, true)}</td><td>${pct(x.r.consumo, true)}</td><td style="text-align:left">${viable ? estado("alerta", "posible, con costo") : estado("critico", "no: " + por)}</td></tr>`;
+      h += `<tr><td>${nom}</td><td>${act}</td><td>${f(x.valor)}</td><td>${pct(x.r.inflacion)}</td><td>${pct(x.r.salarioReal, true)}</td><td>${pct(x.r.empleo, true)}</td><td>${pct(x.r.consumo, true)}</td><td>${pct(x.r.rendDolares, true)}</td><td style="text-align:left">${viable ? (x.r.rendDolares > 30 ? estado("alerta", "posible, pero paga " + pct(x.r.rendDolares) + " en dólares") : x.r.consumo < 0 || x.r.salarioReal < 0 ? estado("alerta", "posible, con caída del consumo") : x.r.inflacion > 26 ? estado("alerta", "posible, con más inflación") : estado("bueno", "posible")) : estado("critico", "no: " + por)}</td></tr>`;
     }
   }
   $("cierre").innerHTML = h;
@@ -378,6 +402,7 @@ function tabla(resp) {
     ["Tasa nominal", k => fmt(ESCENARIOS[k].tasa, 0) + "%"],
     ["Inflación", k => pct(res[k].inflacion), true],
     ["Salario real", k => pct(res[k].salarioReal, true)],
+    ["Empleo", k => pct(res[k].empleo, true)],
     ["Consumo", k => pct(res[k].consumo, true)],
     ["Tipo de cambio real", k => pct(res[k].tcr, true)],
     ["Saldo en divisas", k => usd(res[k].saldo)],

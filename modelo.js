@@ -34,11 +34,12 @@ const RESPUESTAS = {
   saldoCambio: 1200,    // USD M que mejora el saldo por punto de suba del tipo de cambio
   saldoSalario: 500,    // USD M que empeora el saldo por punto de aumento salarial
   saldoTasa: 600,       // USD M que mejora el saldo por punto de suba de la tasa
-  ingresosFin: 0        // ingresos financieros privados netos (USD M)
+  ingresosFin: 0,       // ingresos financieros privados netos (USD M)
+  consumoMasa: 0.7,     // puntos de consumo por punto de masa salarial real (salario real + empleo)
+  empleo: 0,            // variación del empleo (%), que suponemos estable
+  empleoTasa: 0         // puntos de empleo que caen por punto de suba de la tasa (0 = empleo estable)
 };
 
-// Consumo (respuestas fijas, documentadas)
-const CONSUMO = { base: 1.0, porSalarioReal: 0.7, porTasa: 0.25 };   // crecimiento del consumo (%): sube con el salario real, baja con la tasa (crédito)
 
 const PUENTES = {
   caja:    { nombre: "Saldo de caja de 2026", monto: 3700 },
@@ -60,7 +61,10 @@ function simular(pol, resp = RESPUESTAS, b = BASE) {
   const salarioReal = ((1 + pol.salario / 100) / (1 + inflacion / 100) - 1) * 100;
   const tcr = ((1 + devaluacion / 100) * (1 + b.inflacionExt / 100) / (1 + inflacion / 100) - 1) * 100;
   const rendDolares = ((1 + pol.tasa / 100) / (1 + devaluacion / 100) - 1) * 100;
-  const consumo = CONSUMO.base + CONSUMO.porSalarioReal * salarioReal - CONSUMO.porTasa * di;
+  // Consumo: función de la masa salarial real (salario real y nivel de empleo)
+  const empleo = resp.empleo - resp.empleoTasa * di;
+  const masaSalarial = ((1 + salarioReal / 100) * (1 + empleo / 100) - 1) * 100;
+  const consumo = resp.consumoMasa * masaSalarial;
 
   const saldoBase = b.cuentaCorriente - b.atesoramiento;
   const saldo = saldoBase + resp.saldoCambio * de - resp.saldoSalario * dw + resp.saldoTasa * di;
@@ -69,7 +73,7 @@ function simular(pol, resp = RESPUESTAS, b = BASE) {
   const necesidad = b.amortizaciones - b.fuentesProbables;              // 13.300
   const brecha = necesidad - saldo - resp.ingresosFin - puentes;
 
-  return { devaluacion, inflacion, salarioReal, tcr, rendDolares, consumo, saldoBase, saldo,
+  return { devaluacion, inflacion, salarioReal, empleo, masaSalarial, tcr, rendDolares, consumo, saldoBase, saldo,
            puentes, necesidad, brecha };
 }
 
@@ -100,4 +104,4 @@ const ESCENARIOS = {
   C: { nombre: "C. Ajuste con tasa", salario: 22, tipoCambio: 1700, tasa: 50, puentes: ["caja", "locales", "repo", "swap"] }
 };
 
-if (typeof module !== "undefined") module.exports = { simular, cierreConUnInstrumento, variacionCambio, BASE, RESPUESTAS, CONSUMO, PUENTES, ESCENARIOS };
+if (typeof module !== "undefined") module.exports = { simular, cierreConUnInstrumento, variacionCambio, BASE, RESPUESTAS, PUENTES, ESCENARIOS };
