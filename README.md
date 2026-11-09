@@ -6,7 +6,7 @@ Página: https://leandrorodriguez-lab.github.io/trade-off-2027/
 
 ## Enfoque (versión 4: variables nominales)
 
-El gobierno elige tres variables nominales:
+En una economía abierta, con ancla fiscal, se consideran tres variables nominales:
 
 - **Aumento salarial nominal** (mueve el consumo)
 - **Tipo de cambio** a diciembre de 2027
@@ -30,7 +30,7 @@ La brecha a cubrir es `13.300 − saldo en divisas − ingresos financieros − 
 - Inflación: puntos por punto de aumento salarial (0,5), de suba del tipo de cambio (0,3) y de suba de la tasa (−0,15).
 - Saldo en divisas: USD M por punto de suba del tipo de cambio (+1.200), de aumento salarial (−500) y de suba de la tasa (+600).
 - Empleo: cae 0,03 puntos por punto de tasa, más 0,0015 × (puntos de suba)² con subas fuertes. Salario efectivo: pauta − 4 puntos por punto de caída del empleo.
-- Consumo: 0,7 por punto de masa salarial real (salario real + empleo) y −0,1 por punto de tasa (crédito).
+- Consumo: 0,7 por punto de masa salarial real (salario real × empleo) y −0,1 por punto de tasa (crédito).
 - Ingresos financieros privados netos (0) y puentes de financiamiento.
 
 La página muestra cuánto habría que mover cada instrumento por sí solo para cerrar la brecha y con qué costo, y las curvas de consumo contra brecha e inflación.

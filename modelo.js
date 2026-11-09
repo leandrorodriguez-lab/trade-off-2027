@@ -35,7 +35,7 @@ const RESPUESTAS = {
   saldoSalario: 500,    // USD M que empeora el saldo por punto de aumento salarial
   saldoTasa: 600,       // USD M que mejora el saldo por punto de suba de la tasa
   ingresosFin: 0,       // ingresos financieros privados netos (USD M)
-  consumoMasa: 0.7,     // puntos de consumo por punto de masa salarial real (salario real + empleo)
+  consumoMasa: 0.7,     // puntos de consumo por punto de masa salarial real (salario real × empleo)
   consumoTasa: 0.1,     // puntos de consumo que caen por punto de suba de la tasa (menos crédito)
   empleo: 0,            // variación exógena del empleo (%)
   empleoTasa: 0.03,     // puntos de empleo que caen por punto de suba de la tasa
