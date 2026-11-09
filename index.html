@@ -9,49 +9,65 @@
     color-scheme: light;
     --plano: #f9f9f7; --superficie: #fcfcfb; --tinta: #0b0b0b; --tinta2: #52514e; --tenue: #898781;
     --grilla: #e1e0d9; --eje: #c3c2b7; --borde: rgba(11,11,11,0.10);
-    --serie1: #2a78d6; --serie2: #eb6834;
-    --bueno: #0ca30c; --alerta: #fab219; --critico: #d03b3b;
-    --acento-a: #6250d6; --acento-b: #eb6834;
+    --serie1: #2a78d6; --serie2: #eb6834; --serie3: #6250d6;
+    --bueno: #0ca30c; --alerta: #fab219; --critico: #d03b3b; --fondo-critico: rgba(208,59,59,0.07);
   }
   @media (prefers-color-scheme: dark) {
     :root {
       color-scheme: dark;
       --plano: #0d0d0d; --superficie: #1a1a19; --tinta: #f0efec; --tinta2: #c3c2b7; --tenue: #898781;
       --grilla: #2c2c2a; --eje: #383835; --borde: rgba(255,255,255,0.10);
-      --serie1: #3987e5; --serie2: #d95926; --acento-a: #9085e9; --acento-b: #d95926;
+      --serie1: #3987e5; --serie2: #d95926; --serie3: #9085e9; --fondo-critico: rgba(230,103,103,0.10);
     }
   }
   * { box-sizing: border-box; }
   body { margin: 0; background: var(--plano); color: var(--tinta); font: 16px/1.6 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
-  main { max-width: 1080px; margin: 0 auto; padding: 32px 20px 64px; }
+  main { max-width: 1120px; margin: 0 auto; padding: 32px 20px 64px; }
   h1 { font-size: 26px; font-weight: 600; margin: 0 0 6px; }
   h2 { font-size: 18px; font-weight: 600; margin: 0 0 12px; }
-  h3 { font-size: 14px; font-weight: 600; margin: 0 0 8px; color: var(--tinta2); text-transform: none; }
+  h3 { font-size: 14px; font-weight: 600; margin: 0 0 8px; color: var(--tinta2); }
   p { margin: 0 0 12px; }
-  .sub { color: var(--tinta2); max-width: 780px; }
+  .sub { color: var(--tinta2); max-width: 820px; }
+  .chico { font-size: 14px; }
   .tarjeta { background: var(--superficie); border: 1px solid var(--borde); border-radius: 12px; padding: 20px; }
-  .grilla { display: grid; gap: 16px; }
+  .grilla { display: grid; gap: 16px; align-content: start; }
   .g2 { grid-template-columns: 340px 1fr; }
   .g3 { grid-template-columns: repeat(3, 1fr); }
+  .g4 { grid-template-columns: repeat(4, 1fr); }
   .gc { grid-template-columns: 1fr 1fr; }
-  @media (max-width: 860px) { .g2, .g3, .gc { grid-template-columns: 1fr; } }
+  @media (max-width: 900px) { .g2, .g3, .g4, .gc { grid-template-columns: 1fr; } }
   section { margin-top: 24px; }
+  .dato .cifra { font-size: 26px; font-weight: 600; font-variant-numeric: tabular-nums; }
+  .dato .rotulo { font-size: 13px; color: var(--tinta2); }
+  .dato.destacado { border-color: var(--critico); background: var(--fondo-critico); }
+  .fuente { font-size: 12px; color: var(--tenue); margin-top: 8px; }
   .botones { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 18px; }
-  .botones button { font: inherit; font-size: 14px; padding: 7px 14px; border-radius: 8px; border: 1px solid var(--eje); background: transparent; color: var(--tinta); cursor: pointer; }
+  .botones button, .accion { font: inherit; font-size: 14px; padding: 7px 14px; border-radius: 8px; border: 1px solid var(--eje); background: transparent; color: var(--tinta); cursor: pointer; text-align: left; }
   .botones button[aria-pressed="true"] { background: var(--tinta); color: var(--superficie); border-color: var(--tinta); }
+  .accion { margin-top: 10px; }
+  .accion:disabled { opacity: .45; cursor: default; }
   .control { margin-bottom: 18px; }
   .control label { display: flex; justify-content: space-between; font-size: 14px; color: var(--tinta2); gap: 8px; }
   .control output { color: var(--tinta); font-variant-numeric: tabular-nums; font-weight: 600; }
   .control input[type=range] { width: 100%; accent-color: var(--serie1); }
   .ayuda { font-size: 12px; color: var(--tenue); margin-top: 2px; }
-  .puentes label { display: flex; align-items: center; gap: 8px; font-size: 14px; margin: 6px 0; cursor: pointer; }
-  .puentes input { accent-color: var(--serie1); }
-  .metrica { padding: 10px 0; border-top: 1px solid var(--grilla); }
+  .puentes label { display: flex; align-items: flex-start; gap: 8px; font-size: 14px; margin: 6px 0; cursor: pointer; }
+  .puentes input { accent-color: var(--serie1); margin-top: 5px; }
+  .metrica { padding: 8px 0; border-top: 1px solid var(--grilla); }
   .metrica:first-of-type { border-top: 0; }
   .metrica .nombre { font-size: 13px; color: var(--tinta2); }
-  .metrica .valor { font-size: 22px; font-weight: 600; font-variant-numeric: tabular-nums; }
+  .metrica .valor { font-size: 21px; font-weight: 600; font-variant-numeric: tabular-nums; }
   .estado { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; color: var(--tinta2); margin-left: 6px; font-weight: 400; }
   .punto { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+  .pasos { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0; counter-reset: paso; }
+  @media (max-width: 900px) { .pasos { grid-template-columns: 1fr; } }
+  .paso { padding: 14px 16px; border-left: 1px solid var(--grilla); position: relative; }
+  .paso:first-child { border-left: 0; padding-left: 0; }
+  @media (max-width: 900px) { .paso { border-left: 0; border-top: 1px solid var(--grilla); padding-left: 0; } .paso:first-child { border-top: 0; } }
+  .paso .num { font-size: 12px; color: var(--tenue); }
+  .paso .titulo { font-weight: 600; font-size: 15px; margin-bottom: 4px; }
+  .paso .grande { font-size: 22px; font-weight: 600; font-variant-numeric: tabular-nums; }
+  .paso .det { font-size: 13px; color: var(--tinta2); }
   .lectura { border-left: 3px solid var(--serie1); padding: 4px 0 4px 14px; margin: 0; font-size: 15px; }
   .graf { position: relative; height: 300px; }
   details summary { cursor: pointer; font-weight: 600; }
@@ -59,9 +75,10 @@
   ul { margin: 6px 0 12px; padding-left: 20px; }
   li { margin: 4px 0; }
   table { border-collapse: collapse; width: 100%; font-size: 14px; font-variant-numeric: tabular-nums; }
-  th, td { text-align: right; padding: 6px 8px; border-bottom: 1px solid var(--grilla); }
+  th, td { text-align: right; padding: 6px 8px; border-bottom: 1px solid var(--grilla); vertical-align: top; }
   th:first-child, td:first-child { text-align: left; }
   th { color: var(--tinta2); font-weight: 600; }
+  tr.sep td { border-top: 2px solid var(--eje); }
   footer { margin-top: 32px; font-size: 13px; color: var(--tenue); }
 </style>
 </head>
@@ -69,16 +86,24 @@
 <main>
   <header>
     <h1>El dilema de la política económica en 2027</h1>
-    <p class="sub">Con superávit fiscal como ancla, apertura externa y casi sin crédito externo, el gobierno quiere bajar la inflación y subir el consumo con un dólar apreciado. Pero tiene dos instrumentos (tasa de interés y ritmo devaluatorio) para tres objetivos: inflación, consumo y los dólares para pagar los vencimientos. Elegí un escenario o mové los controles.</p>
+    <p class="sub">Con superávit fiscal como ancla, apertura externa y casi sin crédito externo, el gobierno busca bajar la inflación y recuperar el consumo con un dólar apreciado antes de las elecciones. Pero con una brecha de USD 22.700 millones sin cubrir, esa apreciación alimenta la expectativa de una devaluación después de octubre, la gente se dolariza antes, y para contener al dólar hay que subir la tasa, lo que vuelve a meter a la economía en recesión. El equilibrio que puede lograr es precario.</p>
   </header>
+
+  <section class="grilla g4">
+    <div class="tarjeta dato"><div class="rotulo">Vencimientos 2027 de la Nación y del Banco Central</div><div class="cifra">USD 30.100 M</div></div>
+    <div class="tarjeta dato"><div class="rotulo">Fuentes de financiamiento probables</div><div class="cifra">USD 7.400 M</div></div>
+    <div class="tarjeta dato destacado"><div class="rotulo">Brecha a cubrir</div><div class="cifra">USD 22.700 M</div></div>
+    <div class="tarjeta dato"><div class="rotulo">Dolarización en 2026 (compra de dólares para atesoramiento)</div><div class="cifra">USD 2.340 M por mes</div></div>
+  </section>
+  <p class="fuente">Fuente: Centro de Investigación y Formación de la República Argentina (CIFRA), Informe de coyuntura N° 50, octubre de 2026, con base en el Ministerio de Economía y el Banco Central. Además vencen USD 2.400 M de provincias y USD 8.200 M de obligaciones negociables de empresas: USD 40.700 M en total.</p>
 
   <section class="grilla g2">
     <div class="tarjeta">
       <h2>Opciones de política</h2>
       <div class="botones" role="group" aria-label="Escenarios">
-        <button data-esc="A">A. Priorizar consumo</button>
-        <button data-esc="B">B. Frenar la dolarización</button>
-        <button data-esc="C">Intermedio</button>
+        <button data-esc="A">A. Expansión con apreciación</button>
+        <button data-esc="B">B. Corrección anticipada</button>
+        <button data-esc="C">C. Equilibrio precario</button>
       </div>
       <div class="control">
         <label for="tasa">Tasa de interés en pesos (anual) <output id="o-tasa"></output></label>
@@ -88,34 +113,38 @@
       <div class="control">
         <label for="dev">Ritmo devaluatorio mensual <output id="o-dev"></output></label>
         <input type="range" id="dev" min="0" max="4" step="0.1">
-        <div class="ayuda">Más alto: dólar menos barato, pero más traslado a precios.</div>
+        <div class="ayuda">Más bajo: dólar más barato y menos inflación, pero más atraso cambiario.</div>
       </div>
       <div class="control">
         <label for="prima">Prima de riesgo de base <output id="o-prima"></output></label>
         <input type="range" id="prima" min="0" max="15" step="0.5">
-        <div class="ayuda">Riesgo país e incertidumbre electoral. Sube sola si el dólar se atrasa.</div>
+        <div class="ayuda">Riesgo país e incertidumbre política. A esto se suma el salto esperado después de las elecciones.</div>
       </div>
-      <h3>Puentes de financiamiento disponibles</h3>
+      <h3>Puentes para cubrir la brecha</h3>
       <div class="puentes" id="puentes"></div>
+      <div class="ayuda" id="aviso-mercado"></div>
     </div>
 
-    <div class="grilla" style="align-content:start">
+    <div class="grilla">
       <div class="grilla g3">
         <div class="tarjeta">
           <h3>Objetivos</h3>
           <div class="metrica"><div class="nombre">Inflación anual</div><div class="valor" id="m-infl"></div></div>
           <div class="metrica"><div class="nombre">Salario real</div><div class="valor" id="m-sal"></div></div>
           <div class="metrica"><div class="nombre">Consumo</div><div class="valor" id="m-cons"></div></div>
+          <div class="metrica"><div class="nombre">Nivel de actividad</div><div class="valor" id="m-act"></div></div>
         </div>
         <div class="tarjeta">
-          <h3>Precios relativos y cartera</h3>
+          <h3>Expectativas y cartera</h3>
           <div class="metrica"><div class="nombre">Tipo de cambio real</div><div class="valor" id="m-tcr"></div></div>
+          <div class="metrica"><div class="nombre">Salto esperado después de octubre</div><div class="valor" id="m-salto"></div></div>
           <div class="metrica"><div class="nombre">Pesos medidos en dólares menos prima</div><div class="valor" id="m-dif"></div></div>
-          <div class="metrica"><div class="nombre">Atesoramiento en dólares</div><div class="valor" id="m-ates"></div></div>
+          <div class="metrica"><div class="nombre">Dolarización antes de votar</div><div class="valor" id="m-ates"></div></div>
         </div>
         <div class="tarjeta">
-          <h3>Restricción externa 2027</h3>
-          <div class="metrica"><div class="nombre">Dólares que deja el mercado</div><div class="valor" id="m-merc"></div></div>
+          <h3>Brecha externa 2027</h3>
+          <div class="metrica"><div class="nombre">Brecha inicial</div><div class="valor">USD 22.700 M</div></div>
+          <div class="metrica"><div class="nombre">Dólares que deja (o drena) el mercado</div><div class="valor" id="m-merc"></div></div>
           <div class="metrica"><div class="nombre">Puentes activados</div><div class="valor" id="m-puen"></div></div>
           <div class="metrica"><div class="nombre">Dólares que faltan</div><div class="valor" id="m-falt"></div></div>
         </div>
@@ -124,17 +153,29 @@
     </div>
   </section>
 
+  <section class="tarjeta">
+    <h2>El circuito de la contradicción</h2>
+    <p class="sub chico">Lo que pasa con tus opciones si el gobierno, cuando el dólar presiona, sube la tasa para contenerlo.</p>
+    <div class="pasos">
+      <div class="paso"><div class="num">1</div><div class="titulo">Expansión con apreciación</div><div class="grande" id="p1"></div><div class="det" id="p1d"></div></div>
+      <div class="paso"><div class="num">2</div><div class="titulo">Expectativa devaluatoria</div><div class="grande" id="p2"></div><div class="det" id="p2d"></div></div>
+      <div class="paso"><div class="num">3</div><div class="titulo">Dolarización previa</div><div class="grande" id="p3"></div><div class="det" id="p3d"></div></div>
+      <div class="paso"><div class="num">4</div><div class="titulo">Suba de tasa y recesión</div><div class="grande" id="p4"></div><div class="det" id="p4d"></div></div>
+    </div>
+    <button class="accion" id="aplicar">Aplicar la tasa de defensa</button>
+  </section>
+
   <section>
     <div class="grilla gc">
       <div class="tarjeta">
-        <h2>Consumo contra inflación</h2>
-        <p class="sub" style="font-size:14px">La curva muestra qué pasa si solo movés la tasa (de 10% a 60%) con la devaluación elegida. El punto es tu posición.</p>
-        <div class="graf"><canvas id="g1" aria-label="Frontera entre consumo e inflación"></canvas></div>
+        <h2>La tasa contiene al dólar…</h2>
+        <p class="sub chico">Dólares que faltan para 2027 según la tasa de interés, con la devaluación y los puentes elegidos. En cero, la brecha está cubierta.</p>
+        <div class="graf"><canvas id="g1" aria-label="Dólares que faltan según la tasa de interés"></canvas></div>
       </div>
       <div class="tarjeta">
-        <h2>Consumo contra dólares que faltan</h2>
-        <p class="sub" style="font-size:14px">Misma curva. En cero, los vencimientos están cubiertos. Subir la devaluación y la tasa a la vez cambia más inflación por menos faltante.</p>
-        <div class="graf"><canvas id="g2" aria-label="Frontera entre consumo y faltante de dólares"></canvas></div>
+        <h2>…pero hunde la actividad</h2>
+        <p class="sub chico">Crecimiento del nivel de actividad según la tasa de interés. Debajo de cero, recesión.</p>
+        <div class="graf"><canvas id="g2" aria-label="Crecimiento de la actividad según la tasa de interés"></canvas></div>
       </div>
     </div>
   </section>
@@ -147,24 +188,29 @@
   <section class="tarjeta">
     <details open>
       <summary>Cómo funciona el modelo</summary>
-      <p style="margin-top:12px">Notación: i = tasa en pesos, d = devaluación anual, π = inflación, πₙ = inflación de no transables, π* = inflación internacional, α = peso de los transables, ρ = prima de riesgo, r = tasa real.</p>
+      <p style="margin-top:12px">Notación: i = tasa en pesos, d = devaluación anual, π = inflación, πₙ = inflación de no transables, π* = inflación internacional, α = peso de los transables, r = tasa real, s = salto devaluatorio esperado después de las elecciones, ρ₀ = prima de riesgo de base, F = dólares que faltan.</p>
       <ul>
         <li>Inflación: <span class="formula">π = α·d + (1 − α)·πₙ</span>, con <span class="formula">πₙ = inercia + κ·brecha</span></li>
         <li>Demanda: <span class="formula">brecha = −γ·(r − r̄)</span>, con <span class="formula">r = (1 + i)/(1 + π) − 1</span></li>
         <li>Tipo de cambio real: <span class="formula">ΔTCR ≈ d + π* − π</span></li>
-        <li>Quedarse en pesos conviene si <span class="formula">(1 + i)/(1 + d) − 1 &gt; ρ</span>; la prima sube con el atraso cambiario</li>
-        <li>Dólares del mercado = saldo comercial (sube con el tipo de cambio real, baja con el consumo) − atesoramiento + ingresos financieros</li>
-        <li>Faltante = vencimientos del Tesoro + Bonos para la Reconstrucción de una Argentina Libre − fuentes seguras − puentes − dólares del mercado</li>
+        <li>Salto esperado: <span class="formula">s = 0,8·atraso real + 0,3·F/1.000</span>. El atraso y la brecha sin cubrir alimentan la expectativa de devaluar después de octubre.</li>
+        <li>Conviene quedarse en pesos si <span class="formula">(1 + i)/(1 + d) − 1 &gt; ρ₀ + s</span></li>
+        <li>Dolarización: <span class="formula">20.000 − 400·(rendimiento en dólares − ρ₀ − s) + 250·salario real</span></li>
+        <li>Dólares del mercado = cuenta corriente (sube con el tipo de cambio real, baja con el consumo) + ingresos financieros privados − dolarización</li>
+        <li><span class="formula">F = 22.700 − puentes − dólares del mercado</span>. Como s depende de F, el modelo se resuelve en forma iterativa: la brecha alimenta la expectativa, la expectativa alimenta la dolarización y la dolarización agranda la brecha.</li>
+        <li>Tasa de defensa: la mínima con la que conviene quedarse en pesos y el mercado deja de drenar reservas.</li>
+        <li>La emisión en el mercado internacional solo está disponible si la prima total no supera el 9%.</li>
       </ul>
-      <p>Hay dos instrumentos para tres objetivos (regla de Tinbergen): ninguna combinación de tasa y devaluación logra a la vez inflación baja, consumo alto y faltante cero sin puentes de financiamiento.</p>
-      <h3>Supuestos de 2027</h3>
+      <p>Hay dos instrumentos (tasa y devaluación) para tres objetivos (inflación, actividad y dólares). Sin puentes, cubrir la brecha solo con tasa exige una caída de la actividad de más de 6%. Con todos los puentes la brecha puede cerrar, pero con la actividad entre −1% y −2,5% y dependiendo de que la prima de riesgo no suba.</p>
+      <h3>Supuestos de 2027 (CIFRA N° 50)</h3>
       <ul>
-        <li>Vencimientos del Tesoro en moneda extranjera: USD 25.400 millones (bonos, Fondo Monetario Internacional y otros organismos, según LCG).</li>
-        <li>Pagos de los Bonos para la Reconstrucción de una Argentina Libre del Banco Central: USD 4.000 millones (según 1816).</li>
-        <li>Fuentes seguras: USD 7.700 millones (desembolsos del Fondo, refinanciación con organismos y con el sector público, según LCG).</li>
+        <li>Vencimientos del gobierno nacional: USD 24.900 M (capital 15.700 e intereses 9.200).</li>
+        <li>Bonos para la Reconstrucción de una Argentina Libre del Banco Central: USD 5.200 M.</li>
+        <li>Fuentes probables: USD 7.400 M (organismos internacionales 4.100, renovación dentro del sector público 1.800 y privatizaciones 1.500).</li>
+        <li>Quedan en duda: el saldo de caja de 2026 (USD 3.700 M), las compras del Banco Central (USD 4.900 M) y las emisiones locales (el Presupuesto las baja de USD 5.000 a 1.800 M).</li>
         <li>Inflación inercial: 18%, en línea con el Presupuesto 2027.</li>
       </ul>
-      <p class="ayuda">Modelo estilizado con fines didácticos. Los parámetros son ilustrativos, no estimados econométricamente; están en <code>modelo.js</code> para modificarlos.</p>
+      <p class="ayuda">Modelo estilizado con fines didácticos. Los datos de la brecha son de CIFRA; los parámetros de comportamiento son ilustrativos, no estimados econométricamente, y están en <code>modelo.js</code> para modificarlos.</p>
     </details>
   </section>
 
@@ -176,14 +222,14 @@
 <script>
 const $ = id => document.getElementById(id);
 const fmt = (x, dec = 1) => x.toLocaleString("es-AR", { minimumFractionDigits: dec, maximumFractionDigits: dec });
-const pct = (x, signo = false) => (signo && x > 0 ? "+" : "") + fmt(x) + "%";
+const pct = (x, signo = false) => (signo && x > 0.05 ? "+" : "") + fmt(x) + "%";
 const usd = x => "USD " + fmt(Math.round(x), 0) + " M";
 const css = v => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
 
 const contPuentes = $("puentes");
 for (const [k, p] of Object.entries(PUENTES)) {
   const l = document.createElement("label");
-  l.innerHTML = `<input type="checkbox" value="${k}"> ${p.nombre} <span style="color:var(--tenue)">(+${fmt(p.monto / 1000)} mil M)</span>`;
+  l.innerHTML = `<input type="checkbox" value="${k}"><span>${p.nombre} <span style="color:var(--tenue)">(+${fmt(p.monto / 1000)} mil M)</span></span>`;
   contPuentes.appendChild(l);
 }
 
@@ -198,19 +244,16 @@ function leer() {
   return { tasa: +$("tasa").value, dev: +$("dev").value, prima: +$("prima").value, puentes };
 }
 
+let escenarioActivo = null;
 function aplicarEscenario(k) {
   const e = ESCENARIOS[k];
   $("tasa").value = e.tasa; $("dev").value = e.dev;
   contPuentes.querySelectorAll("input").forEach(x => x.checked = e.puentes.includes(x.value));
-  actualizar(k);
+  escenarioActivo = k;
+  actualizar();
 }
 
-let g1, g2;
-function curva(dev, prima, puentes) {
-  const pts = [];
-  for (let i = 10; i <= 60; i += 1) pts.push({ i, r: simular(i, dev, prima, puentes) });
-  return pts;
-}
+let g1, g2, defensaActual = null;
 
 function opcionesGrafico(yTitulo, yFmt) {
   const tinta2 = css("--tinta2"), tenue = css("--tenue"), grilla = css("--grilla");
@@ -218,89 +261,128 @@ function opcionesGrafico(yTitulo, yFmt) {
     responsive: true, maintainAspectRatio: false, animation: false,
     interaction: { mode: "nearest", intersect: false },
     plugins: {
-      legend: { display: false },
-      tooltip: {
-        callbacks: {
-          title: items => items[0].dataset.label === "Tu posición" ? "Tu posición" : "Tasa " + items[0].raw.i + "%",
-          label: c => ["Consumo: " + pct(c.raw.x, true), yTitulo + ": " + yFmt(c.raw.y)]
-        }
-      }
+      legend: { position: "bottom", labels: { color: tinta2, usePointStyle: true, boxWidth: 8 } },
+      tooltip: { callbacks: {
+        title: items => items[0].dataset.label + " · tasa " + fmt(items[0].raw.x, 0) + "%",
+        label: c => yTitulo + ": " + yFmt(c.raw.y)
+      } }
     },
     scales: {
-      x: { type: "linear", title: { display: true, text: "Crecimiento del consumo (%)", color: tinta2 },
-           grid: { color: grilla }, ticks: { color: tenue, callback: v => fmt(v, 0) + "%" } },
-      y: { title: { display: true, text: yTitulo, color: tinta2 },
-           grid: { color: grilla }, ticks: { color: tenue, callback: v => yFmt(v) } }
+      x: { type: "linear", min: 10, max: 60, title: { display: true, text: "Tasa de interés en pesos (% anual)", color: tinta2 },
+           grid: { color: grilla }, ticks: { color: tenue, callback: v => v + "%" } },
+      y: { title: { display: true, text: yTitulo, color: tinta2 }, grid: { color: c => c.tick.value === 0 ? css("--eje") : grilla, lineWidth: c => c.tick.value === 0 ? 1.5 : 1 },
+           ticks: { color: tenue, callback: v => yFmt(v) } }
     }
   };
 }
 
-function datasets(pts, actual, campo, escala) {
-  return [
-    { label: "Moviendo la tasa", data: pts.map(p => ({ x: p.r.consumo, y: (campo === "faltante" ? Math.max(0, p.r[campo]) : p.r[campo]) / escala, i: p.i })),
-      showLine: true, borderColor: css("--serie1"), borderWidth: 2, pointRadius: 0, pointHitRadius: 8, tension: 0.2 },
-    { label: "Tu posición", data: [{ x: actual.consumo, y: (campo === "faltante" ? Math.max(0, actual[campo]) : actual[campo]) / escala }],
-      backgroundColor: css("--serie2"), borderColor: css("--superficie"), borderWidth: 2, pointRadius: 8, pointHoverRadius: 10 }
+function series(v, actual, defensa, campo, transf) {
+  const pts = [];
+  for (let i = 10; i <= 60; i++) pts.push({ x: i, y: transf(simular(i, v.dev, v.prima, v.puentes)[campo]) });
+  const ds = [
+    { label: "Según la tasa", data: pts, showLine: true, borderColor: css("--serie1"), borderWidth: 2, pointRadius: 0, pointHitRadius: 6, tension: 0.2, order: 3 },
+    { label: "Tu posición", data: [{ x: v.tasa, y: transf(actual[campo]) }], backgroundColor: css("--serie2"), borderColor: css("--superficie"), borderWidth: 2, pointRadius: 8, pointHoverRadius: 10, order: 1 }
   ];
+  if (defensa.necesaria && defensa.tasa !== null && defensa.tasa <= 60)
+    ds.push({ label: "Tasa de defensa", data: [{ x: defensa.tasa, y: transf(defensa.r[campo]) }], backgroundColor: css("--serie3"), borderColor: css("--superficie"), borderWidth: 2, pointStyle: "rectRot", pointRadius: 9, pointHoverRadius: 11, order: 2 });
+  return ds;
 }
 
-function actualizar(esc = null) {
+function actualizar() {
   const v = leer();
-  document.querySelectorAll(".botones button").forEach(b => b.setAttribute("aria-pressed", b.dataset.esc === esc ? "true" : "false"));
+  document.querySelectorAll(".botones button").forEach(b => b.setAttribute("aria-pressed", b.dataset.esc === escenarioActivo ? "true" : "false"));
   $("o-tasa").textContent = v.tasa + "%";
   $("o-dev").textContent = fmt(v.dev) + "%";
   $("o-prima").textContent = fmt(v.prima) + "%";
   const r = simular(v.tasa, v.dev, v.prima, v.puentes);
+  const d = tasaDeDefensa(v.tasa, v.dev, v.prima, v.puentes);
+  defensaActual = d;
+  const falt = Math.max(0, r.faltante);
 
   $("m-infl").innerHTML = pct(r.infl) + (r.infl <= 18 ? estado("bueno", "bajo la meta") : r.infl <= 24 ? estado("alerta", "sobre la meta") : estado("critico", "se acelera"));
   $("m-sal").innerHTML = pct(r.salarioReal, true) + (r.salarioReal > 0.5 ? estado("bueno", "mejora") : r.salarioReal > -0.5 ? estado("alerta", "estancado") : estado("critico", "cae"));
   $("m-cons").innerHTML = pct(r.consumo, true) + (r.consumo > 2 ? estado("bueno", "crece") : r.consumo > 0 ? estado("alerta", "débil") : estado("critico", "cae"));
-  $("m-tcr").innerHTML = pct(r.tcr, true) + (r.tcr < -2 ? estado("critico", "se atrasa") : r.tcr < 2 ? estado("alerta", "estable") : estado("bueno", "se recupera"));
+  $("m-act").innerHTML = pct(r.actividad, true) + (r.actividad > 1 ? estado("bueno", "crece") : r.actividad > 0 ? estado("alerta", "estancada") : estado("critico", "recesión"));
+  $("m-tcr").innerHTML = pct(r.tcr, true) + (r.tcr < -1 ? estado("critico", "se atrasa") : r.tcr < 2 ? estado("alerta", "estable") : estado("bueno", "se recupera"));
+  $("m-salto").innerHTML = pct(r.salto) + (r.salto < 2 ? estado("bueno", "bajo") : r.salto < 6 ? estado("alerta", "moderado") : estado("critico", "alto"));
   $("m-dif").innerHTML = pct(r.diferencial, true) + (r.diferencial > 1 ? estado("bueno", "conviene el peso") : r.diferencial > -1 ? estado("alerta", "al límite") : estado("critico", "conviene el dólar"));
-  $("m-ates").textContent = usd(r.atesoramiento);
-  $("m-merc").textContent = usd(r.dolaresMercado);
+  $("m-ates").innerHTML = usd(r.dolarizacion) + (r.dolarizacion <= 18000 ? estado("bueno", "contenida") : r.dolarizacion <= 21000 ? estado("alerta", "alta") : estado("critico", "se acelera"));
+  $("m-merc").textContent = (r.dolaresMercado < 0 ? "−" : "") + usd(Math.abs(r.dolaresMercado));
   $("m-puen").textContent = usd(r.puentes);
-  const falt = Math.max(0, r.faltante);
   $("m-falt").innerHTML = (falt === 0 ? "Cubierto" : usd(falt)) + (falt === 0 ? estado("bueno", "cierra") : falt < 5000 ? estado("alerta", "ajustado") : estado("critico", "no cierra"));
+  $("aviso-mercado").textContent = v.puentes.includes("mercado") && !r.mercadoIntlDisponible ? "Con esta prima de riesgo no hay acceso al mercado internacional: ese puente no suma." : "";
 
-  const logros = [r.infl <= 18, r.consumo > 2, falt === 0];
-  const n = logros.filter(Boolean).length;
-  const partes = [];
-  partes.push(r.infl <= 18 ? "la inflación queda bajo la meta" : "la inflación supera la meta");
-  partes.push(r.consumo > 2 ? "el consumo crece" : "el consumo no arranca");
-  partes.push(falt === 0 ? "alcanzan los dólares para los vencimientos" : `faltan unos ${usd(falt)} para los vencimientos`);
-  let cierre;
-  if (n === 3) cierre = " Solo cierra porque los puentes de financiamiento cubren la diferencia: sacalos y fijate qué pasa.";
-  else if (!logros[2] && logros[1]) cierre = " Es el camino A: el consumo se sostiene con un dólar barato que consume los dólares que hacen falta para pagar.";
-  else if (logros[2] && !logros[1]) cierre = " Es el camino B: se juntan los dólares a costa del salario y del consumo.";
-  else cierre = " Con dos instrumentos no alcanza para los tres objetivos.";
-  $("lectura").textContent = `Con esta combinación ${partes[0]}, ${partes[1]} y ${partes[2]}.` + cierre;
-
-  const pts = curva(v.dev, v.prima, v.puentes);
-  const d1 = datasets(pts, r, "infl", 1), d2 = datasets(pts, r, "faltante", 1000);
-  if (!g1) {
-    g1 = new Chart($("g1"), { type: "scatter", data: { datasets: d1 }, options: opcionesGrafico("Inflación anual (%)", y => fmt(y, 0) + "%") });
-    g2 = new Chart($("g2"), { type: "scatter", data: { datasets: d2 }, options: opcionesGrafico("Faltante (miles de millones de USD)", y => fmt(y, 0)) });
+  // Circuito
+  $("p1").textContent = "Consumo " + pct(r.consumo, true);
+  $("p1d").textContent = r.tcr < 0 ? `con el tipo de cambio real atrasándose ${fmt(-r.tcr)}% y la inflación en ${fmt(r.infl)}%.` : `pero con el tipo de cambio real subiendo ${fmt(r.tcr)}% y la inflación en ${fmt(r.infl)}%.`;
+  $("p2").textContent = "Salto esperado " + pct(r.salto);
+  $("p2d").textContent = `después de octubre, por el atraso y por los ${usd(falt)} sin cubrir.`;
+  $("p3").textContent = usd(r.dolarizacion);
+  $("p3d").textContent = r.dolaresMercado < 0 ? `de compra de dólares para atesorar: el mercado drena ${usd(-r.dolaresMercado)} de reservas.` : `de compra de dólares para atesorar; el mercado todavía aporta ${usd(r.dolaresMercado)}.`;
+  if (!d.necesaria) {
+    $("p4").textContent = "No hace falta subir";
+    $("p4d").textContent = `Con ${v.tasa}% el dólar está contenido, pero la actividad queda en ${pct(r.actividad, true)} y faltan ${falt === 0 ? "0" : usd(falt)}.`;
+    $("aplicar").disabled = true;
+  } else if (d.tasa === null) {
+    $("p4").textContent = "Ninguna tasa alcanza";
+    $("p4d").textContent = "Ni con 150% se contiene el dólar: el ajuste llega por un salto cambiario.";
+    $("aplicar").disabled = true;
   } else {
-    g1.data.datasets = d1; g1.update(); g2.data.datasets = d2; g2.update();
+    $("p4").textContent = `Tasa ${d.tasa}% → actividad ${pct(d.r.actividad, true)}`;
+    $("p4d").textContent = `Para contener al dólar la tasa sube ${d.tasa - v.tasa} puntos; el consumo pasa a ${pct(d.r.consumo, true)} y todavía faltan ${Math.max(0, d.r.faltante) === 0 ? "USD 0" : usd(Math.max(0, d.r.faltante))}.`;
+    $("aplicar").disabled = d.tasa > 60;
   }
+
+  // Lectura
+  let txt;
+  if (falt > 0 && d.necesaria && d.tasa !== null)
+    txt = `La expansión dura poco: el dólar barato y la brecha sin cubrir llevan a esperar un salto de ${fmt(r.salto)}% después de las elecciones, la dolarización previa llega a ${usd(r.dolarizacion)} y, para frenarla, la tasa tiene que subir a ${d.tasa}%. Con eso la actividad pasa de ${pct(r.actividad, true)} a ${pct(d.r.actividad, true)} y aun así faltan ${usd(Math.max(0, d.r.faltante))}.`;
+  else if (falt > 0 && !d.necesaria)
+    txt = `El dólar está contenido porque la tasa ya es alta (tasa real de ${fmt(r.tasaReal)}%), pero el costo es una actividad de ${pct(r.actividad, true)} y siguen faltando ${usd(falt)} para los vencimientos.`;
+  else if (falt === 0 && r.actividad <= 0.5)
+    txt = `La brecha se cubre, pero con la economía estancada (${pct(r.actividad, true)}) y gracias a ${usd(r.puentes)} de puentes. Es un equilibrio precario: subí la prima de riesgo o sacá un puente y mirá cómo se rompe.`;
+  else if (falt === 0)
+    txt = `La brecha se cubre con ${usd(r.puentes)} de puentes y la actividad crece ${pct(r.actividad)}. Depende de que todos los puentes estén disponibles: probá subir la prima de riesgo.`;
+  else
+    txt = `Faltan ${usd(falt)}: ni la tasa alcanza para contener al dólar, y el ajuste llegaría por un salto cambiario.`;
+  $("lectura").textContent = txt;
+
+  const milesM = x => Math.max(0, x) / 1000;
+  const d1 = series(v, r, d, "faltante", milesM), d2 = series(v, r, d, "actividad", x => x);
+  if (!g1) {
+    g1 = new Chart($("g1"), { type: "scatter", data: { datasets: d1 }, options: opcionesGrafico("Faltan (miles de millones de USD)", y => fmt(y, 0)) });
+    g2 = new Chart($("g2"), { type: "scatter", data: { datasets: d2 }, options: opcionesGrafico("Actividad (%)", y => fmt(y, 0) + "%") });
+  } else { g1.data.datasets = d1; g1.update(); g2.data.datasets = d2; g2.update(); }
   tabla(v.prima);
 }
 
 function tabla(prima) {
-  const filas = [["Inflación anual", "infl", pct], ["Salario real", "salarioReal", x => pct(x, true)], ["Consumo", "consumo", x => pct(x, true)],
-                 ["Tipo de cambio real", "tcr", x => pct(x, true)], ["Atesoramiento", "atesoramiento", usd], ["Faltante de dólares", "faltante", x => x <= 0 ? "Cubierto" : usd(x)]];
-  const res = Object.fromEntries(Object.entries(ESCENARIOS).map(([k, e]) => [k, simular(e.tasa, e.dev, prima, e.puentes)]));
+  const res = {}, def = {};
+  for (const [k, e] of Object.entries(ESCENARIOS)) { res[k] = simular(e.tasa, e.dev, prima, e.puentes); def[k] = tasaDeDefensa(e.tasa, e.dev, prima, e.puentes); }
+  const filas = [
+    ["Inflación anual", k => pct(res[k].infl)],
+    ["Consumo", k => pct(res[k].consumo, true)],
+    ["Nivel de actividad", k => pct(res[k].actividad, true)],
+    ["Tipo de cambio real", k => pct(res[k].tcr, true)],
+    ["Salto esperado después de octubre", k => pct(res[k].salto)],
+    ["Dolarización antes de votar", k => usd(res[k].dolarizacion)],
+    ["Puentes usados", k => usd(res[k].puentes)],
+    ["Dólares que faltan", k => res[k].faltante <= 0 ? "Cubierto" : usd(res[k].faltante)],
+    ["Tasa para contener al dólar", k => !def[k].necesaria ? "No hace falta" : def[k].tasa === null ? "Ninguna alcanza" : def[k].tasa + "%", true],
+    ["Actividad con esa tasa", k => !def[k].necesaria ? pct(res[k].actividad, true) : def[k].tasa === null ? "—" : pct(def[k].r.actividad, true)],
+    ["Faltan con esa tasa", k => { const x = (def[k].necesaria ? def[k].r : res[k]).faltante; return x <= 0 ? "Cubierto" : usd(x); }]
+  ];
   let h = "<tr><th></th>" + Object.values(ESCENARIOS).map(e => `<th>${e.nombre}<br><span style="font-weight:400;color:var(--tenue)">tasa ${e.tasa}%, devaluación ${fmt(e.dev)}% mensual</span></th>`).join("") + "</tr>";
-  for (const [n, c, f] of filas) h += `<tr><td>${n}</td>` + Object.keys(ESCENARIOS).map(k => `<td>${f(res[k][c])}</td>`).join("") + "</tr>";
+  for (const [n, f, sep] of filas) h += `<tr${sep ? ' class="sep"' : ""}><td>${n}</td>` + Object.keys(ESCENARIOS).map(k => `<td>${f(k)}</td>`).join("") + "</tr>";
   $("tabla").innerHTML = h;
 }
 
 document.querySelectorAll(".botones button").forEach(b => b.addEventListener("click", () => aplicarEscenario(b.dataset.esc)));
-["tasa", "dev", "prima"].forEach(id => $(id).addEventListener("input", () => actualizar()));
-contPuentes.addEventListener("change", () => actualizar());
+["tasa", "dev", "prima"].forEach(id => $(id).addEventListener("input", () => { escenarioActivo = null; actualizar(); }));
+contPuentes.addEventListener("change", () => { escenarioActivo = null; actualizar(); });
+$("aplicar").addEventListener("click", () => { if (defensaActual && defensaActual.tasa) { $("tasa").value = defensaActual.tasa; escenarioActivo = null; actualizar(); } });
 $("prima").value = 5;
-aplicarEscenario("C");
+aplicarEscenario("A");
 </script>
 </body>
 </html>
