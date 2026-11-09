@@ -82,7 +82,7 @@
 <main>
   <header>
     <h1>El dilema de la política económica en 2027</h1>
-    <p class="sub">En una economía abierta, con ancla fiscal, se consideran tres variables nominales: el aumento de los salarios, el tipo de cambio y la tasa de interés. La inflación sube con los salarios y con el tipo de cambio, y baja con la tasa. El saldo de divisas del sector privado (cuenta corriente menos compras para atesoramiento) mejora con el tipo de cambio y con la tasa, y empeora con los salarios. Con esos dos resultados se examina la necesidad de dólares para 2027 sin crédito externo.</p>
+    <p class="sub">En una economía abierta, con ancla fiscal, se consideran tres variables nominales: el aumento de los salarios, el tipo de cambio y la tasa de interés. La inflación sube con los salarios y con el tipo de cambio, y baja o se frena con la tasa (en los comandos se pueden manipular esas relaciones). El saldo de divisas del sector privado (cuenta corriente menos compras para atesoramiento) mejora con el tipo de cambio y con la tasa, y empeora con los salarios. Con esos dos resultados se examina la necesidad de dólares para 2027 sin crédito externo.</p>
   </header>
 
   <section class="grilla g4">
@@ -193,7 +193,7 @@
       </details>
 
       <details class="bloque" open>
-        <summary>Puentes para cubrir la brecha</summary>
+        <summary>Otras fuentes de financiamiento</summary>
         <div class="puentes" id="puentes"></div>
       </details>
       <button class="accion" id="reset" style="margin-top:10px">Volver a las respuestas iniciales</button>
@@ -219,7 +219,7 @@
           <h3>Brecha externa 2027</h3>
           <div class="metrica"><div class="nombre">Amortizaciones − fuentes probables</div><div class="valor">USD 13.300 M</div></div>
           <div class="metrica"><div class="nombre">− Saldo en divisas del sector privado</div><div class="valor" id="m-saldo"></div><div class="det">con niveles actuales: 4.533 − 28.000 = −23.467</div></div>
-          <div class="metrica"><div class="nombre">− Ingresos financieros y puentes</div><div class="valor" id="m-puen"></div></div>
+          <div class="metrica"><div class="nombre">− Ingresos financieros y otras fuentes de financiamiento</div><div class="valor" id="m-puen"></div></div>
           <div class="metrica total"><div class="nombre">Brecha sin cubrir</div><div class="valor" id="m-brecha"></div></div>
         </div>
       </div>
@@ -270,7 +270,7 @@
         <li>Salario efectivo: <span class="formula">w = pauta + φ·(E − E₀)</span>. Un mercado de trabajo más débil modera las paritarias.</li>
         <li>Inflación: <span class="formula">π = π₀ + a_w·(w − w₀) + a_e·(e − e₀) − a_i·(i − i₀)</span></li>
         <li>Saldo en divisas: <span class="formula">S = (4.533 − 28.000) + c_e·(e − e₀) − c_w·(w − w₀) + c_i·(i − i₀)</span></li>
-        <li>Brecha: <span class="formula">13.300 − S − ingresos financieros − puentes</span></li>
+        <li>Brecha: <span class="formula">13.300 − S − ingresos financieros − otras fuentes de financiamiento</span></li>
         <li>Salario real: <span class="formula">(1 + w)/(1 + π) − 1</span>; tipo de cambio real: <span class="formula">(1 + e)(1 + 2,5%)/(1 + π) − 1</span></li>
         <li>Consumo: <span class="formula">c·masa salarial real − k·(i − i₀)</span>, con masa salarial real = salario real × empleo. El segundo término es el canal del crédito.</li>
         <li>Rendimiento de los pesos en dólares: <span class="formula">(1 + i)/(1 + e) − 1</span></li>
@@ -458,7 +458,7 @@ function tabla(resp) {
     ["Consumo", k => pct(res[k].consumo, true)],
     ["Tipo de cambio real", k => pct(res[k].tcr, true)],
     ["Saldo en divisas", k => usd(res[k].saldo)],
-    ["Puentes", k => usd(res[k].puentes)],
+    ["Otras fuentes de financiamiento", k => usd(res[k].puentes)],
     ["Brecha sin cubrir", k => res[k].brecha <= 0 ? "Cubierta" : usd(res[k].brecha)]
   ];
   let h = "<tr><th></th>" + Object.values(ESCENARIOS).map(e => `<th>${e.nombre}</th>`).join("") + "</tr>";

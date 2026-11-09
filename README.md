@@ -17,7 +17,7 @@ Dos resultados son endógenos:
 - **Inflación**: sube con los salarios y con el tipo de cambio, baja con la tasa.
 - **Saldo en divisas del sector privado** (cuenta corriente − compras netas para atesoramiento): mejora con el tipo de cambio y con la tasa, empeora con los salarios.
 
-La brecha a cubrir es `13.300 − saldo en divisas − ingresos financieros − puentes`, donde 13.300 = amortizaciones 2027 (20.700) − fuentes probables (7.400), según CIFRA (Informe de coyuntura N° 50).
+La brecha a cubrir es `13.300 − saldo en divisas − ingresos financieros − otras fuentes de financiamiento`, donde 13.300 = amortizaciones 2027 (20.700) − fuentes probables (7.400), según CIFRA (Informe de coyuntura N° 50).
 
 ## Punto de partida (niveles actuales, noviembre de 2026)
 
@@ -31,7 +31,7 @@ La brecha a cubrir es `13.300 − saldo en divisas − ingresos financieros − 
 - Saldo en divisas: USD M por punto de suba del tipo de cambio (+1.200), de aumento salarial (−500) y de suba de la tasa (+600).
 - Empleo: cae 0,03 puntos por punto de tasa, más 0,0015 × (puntos de suba)² con subas fuertes. Salario efectivo: pauta − 4 puntos por punto de caída del empleo.
 - Consumo: 0,7 por punto de masa salarial real (salario real × empleo) y −0,1 por punto de tasa (crédito).
-- Ingresos financieros privados netos (0) y puentes de financiamiento.
+- Ingresos financieros privados netos (0) y otras fuentes de financiamiento (saldo de caja, emisiones locales, repo, swap).
 
 La página muestra cuánto habría que mover cada instrumento por sí solo para cerrar la brecha y con qué costo, y las curvas de consumo contra brecha e inflación.
 
