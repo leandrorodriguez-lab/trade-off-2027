@@ -36,9 +36,11 @@ const RESPUESTAS = {
   saldoTasa: 600,       // USD M que mejora el saldo por punto de suba de la tasa
   ingresosFin: 0,       // ingresos financieros privados netos (USD M)
   consumoMasa: 0.7,     // puntos de consumo por punto de masa salarial real (salario real + empleo)
-  consumoTasa: 0.2,     // puntos de consumo que caen por punto de suba de la tasa (menos crédito)
-  empleo: 0,            // variación del empleo (%), que suponemos estable
-  empleoTasa: 0         // puntos de empleo que caen por punto de suba de la tasa (0 = empleo estable)
+  consumoTasa: 0.1,     // puntos de consumo que caen por punto de suba de la tasa (menos crédito)
+  empleo: 0,            // variación exógena del empleo (%)
+  empleoTasa: 0.03,     // puntos de empleo que caen por punto de suba de la tasa
+  empleoTasa2: 0.0015,  // caída adicional del empleo con subas fuertes: coeficiente × (puntos de suba)²
+  salarioEmpleo: 4      // puntos de aumento salarial nominal que se pierden por punto de caída del empleo
 };
 
 
@@ -53,17 +55,20 @@ function variacionCambio(tc, b = BASE) { return (tc / b.tipoCambioHoy - 1) * 100
 
 // pol = { salario, tipoCambio, tasa, puentes }   resp = respuestas
 function simular(pol, resp = RESPUESTAS, b = BASE) {
-  const dw = pol.salario - b.salario;
+  const di = pol.tasa - b.tasa;
+  // Empleo: cae con la tasa (crédito), y más que proporcionalmente con subas fuertes
+  const empleo = resp.empleo - resp.empleoTasa * di - resp.empleoTasa2 * Math.max(0, di) ** 2;
+  // Salario efectivo: la pauta menos el efecto de un mercado de trabajo más débil
+  const salarioEfectivo = pol.salario + resp.salarioEmpleo * Math.min(0, empleo - resp.empleo) + resp.salarioEmpleo * Math.max(0, empleo - resp.empleo) * 0.5;
+  const dw = salarioEfectivo - b.salario;
   const devaluacion = variacionCambio(pol.tipoCambio, b);
   const de = devaluacion - variacionCambio(b.tipoCambio, b);
-  const di = pol.tasa - b.tasa;
 
   const inflacion = b.inflacion + resp.inflSalario * dw + resp.inflCambio * de - resp.inflTasa * di;
-  const salarioReal = ((1 + pol.salario / 100) / (1 + inflacion / 100) - 1) * 100;
+  const salarioReal = ((1 + salarioEfectivo / 100) / (1 + inflacion / 100) - 1) * 100;
   const tcr = ((1 + devaluacion / 100) * (1 + b.inflacionExt / 100) / (1 + inflacion / 100) - 1) * 100;
   const rendDolares = ((1 + pol.tasa / 100) / (1 + devaluacion / 100) - 1) * 100;
-  // Consumo: función de la masa salarial real (salario real y empleo) y del crédito (baja con la tasa)
-  const empleo = resp.empleo - resp.empleoTasa * di;
+  // Consumo: masa salarial real (salario real y empleo) y crédito (baja con la tasa)
   const masaSalarial = ((1 + salarioReal / 100) * (1 + empleo / 100) - 1) * 100;
   const consumo = resp.consumoMasa * masaSalarial - resp.consumoTasa * di;
 
@@ -74,28 +79,26 @@ function simular(pol, resp = RESPUESTAS, b = BASE) {
   const necesidad = b.amortizaciones - b.fuentesProbables;              // 13.300
   const brecha = necesidad - saldo - resp.ingresosFin - puentes;
 
-  return { devaluacion, inflacion, salarioReal, empleo, masaSalarial, tcr, rendDolares, consumo, saldoBase, saldo,
+  return { devaluacion, inflacion, salarioEfectivo, salarioReal, empleo, masaSalarial, tcr, rendDolares, consumo, saldoBase, saldo,
            puentes, necesidad, brecha };
 }
 
-// Valor de un solo instrumento que cierra la brecha (los otros dos quedan fijos).
+// Valor de un solo instrumento que cierra la brecha (los otros dos quedan fijos), por bisección.
+function resolver(f, a, bmax) {           // f creciente o decreciente; busca f(x) = 0 en [a, bmax]
+  let fa = f(a), fb = f(bmax);
+  if (fa * fb > 0) return null;
+  for (let k = 0; k < 80; k++) { const m = (a + bmax) / 2, fm = f(m); if (fa * fm <= 0) { bmax = m; fb = fm; } else { a = m; fa = fm; } }
+  return (a + bmax) / 2;
+}
 function cierreConUnInstrumento(pol, resp = RESPUESTAS, b = BASE) {
   const r0 = simular(pol, resp, b);
-  const out = {};
-  const B = r0.brecha;
-  // salario: el saldo empeora con salarios ⇒ hay que bajar el aumento salarial
-  out.salario = resp.saldoSalario > 0 ? pol.salario - B / resp.saldoSalario : null;
-  // tipo de cambio: puntos de variación adicionales
-  if (resp.saldoCambio > 0) {
-    const nuevaVar = r0.devaluacion + B / resp.saldoCambio;
-    out.tipoCambio = b.tipoCambioHoy * (1 + nuevaVar / 100);
-  } else out.tipoCambio = null;
-  out.tasa = resp.saldoTasa > 0 ? pol.tasa + B / resp.saldoTasa : null;
   const res = {};
-  if (out.salario !== null) res.salario = { valor: out.salario, r: simular({ ...pol, salario: out.salario }, resp, b) };
-  if (out.tipoCambio !== null) res.tipoCambio = { valor: out.tipoCambio, r: simular({ ...pol, tipoCambio: out.tipoCambio }, resp, b) };
-  if (out.tasa !== null) res.tasa = { valor: out.tasa, r: simular({ ...pol, tasa: out.tasa }, resp, b) };
-  return { brecha: B, res };
+  const rangos = { salario: [-60, 60], tipoCambio: [800, 6000], tasa: [0, 200] };
+  for (const [k, [a, z]] of Object.entries(rangos)) {
+    const x = resolver(v => simular({ ...pol, [k]: v }, resp, b).brecha, a, z);
+    if (x !== null) res[k] = { valor: x, r: simular({ ...pol, [k]: x }, resp, b) };
+  }
+  return { brecha: r0.brecha, res };
 }
 
 const ESCENARIOS = {

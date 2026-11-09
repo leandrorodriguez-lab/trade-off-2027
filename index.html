@@ -103,9 +103,9 @@
         <button data-esc="C">C. Ajuste con tasa</button>
       </div>
       <div class="control" style="margin-top:14px">
-        <label for="salario">Aumento salarial nominal 2027 <output id="o-salario"></output></label>
+        <label for="salario">Aumento salarial nominal pautado 2027 <output id="o-salario"></output></label>
         <input type="range" id="salario" min="0" max="50" step="1">
-        <div class="ayuda">Nivel actual: 22%. El consumo sigue al salario real.</div>
+        <div class="ayuda">Nivel actual: 22%. El aumento efectivo puede ser menor si la tasa alta debilita el empleo.</div>
       </div>
       <div class="control">
         <label for="tc">Tipo de cambio a diciembre de 2027 <output id="o-tc"></output></label>
@@ -159,26 +159,36 @@
       </details>
 
       <details class="bloque" open>
-        <summary>Respuestas del consumo</summary>
+        <summary>Respuestas del empleo, los salarios y el consumo</summary>
+        <div class="control">
+          <label for="r-et">Si la tasa sube 1 punto, el empleo cae <output id="o-et"></output></label>
+          <input type="range" id="r-et" min="0" max="0.15" step="0.005">
+          <div class="ayuda">Canal del crédito sobre la actividad.</div>
+        </div>
+        <div class="control">
+          <label for="r-e2">Caída adicional del empleo con subas fuertes <output id="o-e2"></output></label>
+          <input type="range" id="r-e2" min="0" max="0.005" step="0.0001">
+          <div class="ayuda" id="a-e2"></div>
+        </div>
+        <div class="control">
+          <label for="r-we">Si el empleo cae 1 punto, los salarios suben menos <output id="o-we"></output></label>
+          <input type="range" id="r-we" min="0" max="8" step="0.5">
+          <div class="ayuda">Con un mercado de trabajo más débil, las paritarias cierran por debajo de la pauta.</div>
+        </div>
         <div class="control">
           <label for="r-cm">Si la masa salarial real sube 1 punto, el consumo sube <output id="o-cm"></output></label>
           <input type="range" id="r-cm" min="0" max="1.5" step="0.05">
           <div class="ayuda">Masa salarial real = salario real + empleo.</div>
         </div>
         <div class="control">
-          <label for="r-ct">Si la tasa sube 1 punto, el consumo cae <output id="o-ct"></output></label>
+          <label for="r-ct">Si la tasa sube 1 punto, el consumo cae además <output id="o-ct"></output></label>
           <input type="range" id="r-ct" min="0" max="0.6" step="0.01">
-          <div class="ayuda">Canal del crédito: con tasa más alta se financia menos consumo.</div>
+          <div class="ayuda">Menos crédito para financiar consumo.</div>
         </div>
         <div class="control">
-          <label for="r-em">Variación del empleo <output id="o-em"></output></label>
+          <label for="r-em">Variación exógena del empleo <output id="o-em"></output></label>
           <input type="range" id="r-em" min="-5" max="5" step="0.5">
-          <div class="ayuda">Supuesto inicial: empleo estable.</div>
-        </div>
-        <div class="control">
-          <label for="r-et">Si la tasa sube 1 punto, el empleo cae <output id="o-et"></output></label>
-          <input type="range" id="r-et" min="0" max="0.3" step="0.01">
-          <div class="ayuda">Arranca en cero (empleo estable). Subilo si querés que la tasa también afecte el empleo.</div>
+          <div class="ayuda">Supuesto inicial: estable.</div>
         </div>
       </details>
 
@@ -194,6 +204,7 @@
         <div class="tarjeta">
           <h3>Objetivos</h3>
           <div class="metrica"><div class="nombre">Inflación anual</div><div class="valor" id="m-infl"></div></div>
+          <div class="metrica"><div class="nombre">Aumento salarial efectivo</div><div class="valor" id="m-wef"></div></div>
           <div class="metrica"><div class="nombre">Salario real</div><div class="valor" id="m-sal"></div></div>
           <div class="metrica"><div class="nombre">Empleo</div><div class="valor" id="m-emp"></div></div>
           <div class="metrica"><div class="nombre">Consumo</div><div class="valor" id="m-cons"></div></div>
@@ -222,6 +233,13 @@
     <div class="tabla-wrap"><table id="cierre"></table></div>
   </section>
 
+  <section class="tarjeta">
+    <h2>Cuando la tasa sube mucho, el salario real se da vuelta</h2>
+    <p class="sub chico">Con el salario pautado y el tipo de cambio fijos, una suba moderada de la tasa baja la inflación más que los salarios y el salario real mejora. Pero la tasa también contrae el crédito y el empleo, y con un mercado de trabajo más débil las paritarias cierran más abajo. Con subas fuertes, los salarios pasan a crecer menos que la inflación. El rombo marca tu tasa.</p>
+    <p class="chico" id="t-giro"></p>
+    <div class="graf"><canvas id="g3" aria-label="Empleo, salario real y consumo según la tasa"></canvas></div>
+  </section>
+
   <section>
     <div class="grilla gc">
       <div class="tarjeta">
@@ -246,13 +264,15 @@
     <details open>
       <summary style="cursor:pointer;font-weight:600">Cómo funciona el modelo</summary>
       <p style="margin-top:12px">Supuestos: no hay acceso al mercado internacional de capitales; la economía es abierta; no hay límites al atesoramiento de las personas; hay superávit fiscal, así que el impulso de demanda no es fiscal.</p>
-      <p>Notación: w = aumento salarial nominal, e = suba del tipo de cambio en el año, i = tasa nominal, π = inflación, S = saldo en divisas del sector privado. El subíndice ₀ indica el nivel actual (w₀ = 22%, e₀ = 4,9%, i₀ = 24%, π₀ = 22%). Los coeficientes a y c son las respuestas que se mueven en la página.</p>
+      <p>Notación: w = aumento salarial nominal efectivo, E = empleo, e = suba del tipo de cambio en el año, i = tasa nominal, π = inflación, S = saldo en divisas del sector privado. El subíndice ₀ indica el nivel actual (w₀ = 22%, e₀ = 4,9%, i₀ = 24%, π₀ = 22%). Los coeficientes a y c son las respuestas que se mueven en la página.</p>
       <ul>
+        <li>Empleo: <span class="formula">E = E₀ − b·(i − i₀) − b₂·[máx(0, i − i₀)]²</span>. Con subas fuertes, la caída se acelera.</li>
+        <li>Salario efectivo: <span class="formula">w = pauta + φ·(E − E₀)</span>. Un mercado de trabajo más débil modera las paritarias.</li>
         <li>Inflación: <span class="formula">π = π₀ + a_w·(w − w₀) + a_e·(e − e₀) − a_i·(i − i₀)</span></li>
         <li>Saldo en divisas: <span class="formula">S = (4.533 − 28.000) + c_e·(e − e₀) − c_w·(w − w₀) + c_i·(i − i₀)</span></li>
         <li>Brecha: <span class="formula">13.300 − S − ingresos financieros − puentes</span></li>
         <li>Salario real: <span class="formula">(1 + w)/(1 + π) − 1</span>; tipo de cambio real: <span class="formula">(1 + e)(1 + 2,5%)/(1 + π) − 1</span></li>
-        <li>Consumo: <span class="formula">c·masa salarial real − k·(i − i₀)</span>, con masa salarial real = salario real + empleo. El segundo término es el canal del crédito. Supuesto inicial: empleo estable; opcionalmente, <span class="formula">empleo = empleo exógeno − b·(i − i₀)</span>.</li>
+        <li>Consumo: <span class="formula">c·masa salarial real − k·(i − i₀)</span>, con masa salarial real = salario real + empleo. El segundo término es el canal del crédito.</li>
         <li>Rendimiento de los pesos en dólares: <span class="formula">(1 + i)/(1 + e) − 1</span></li>
       </ul>
       <p class="ayuda">Modelo lineal con fines didácticos. Las respuestas iniciales son ilustrativas, no estimadas econométricamente; están en <code>modelo.js</code> y se pueden cambiar desde la página.</p>
@@ -279,7 +299,7 @@ for (const [k, p] of Object.entries(PUENTES)) {
   contPuentes.appendChild(l);
 }
 const RESP_INI = { ...RESPUESTAS };
-const mapaResp = { "r-iw": "inflSalario", "r-ie": "inflCambio", "r-ii": "inflTasa", "r-se": "saldoCambio", "r-sw": "saldoSalario", "r-si": "saldoTasa", "r-if": "ingresosFin", "r-cm": "consumoMasa", "r-ct": "consumoTasa", "r-em": "empleo", "r-et": "empleoTasa" };
+const mapaResp = { "r-iw": "inflSalario", "r-ie": "inflCambio", "r-ii": "inflTasa", "r-se": "saldoCambio", "r-sw": "saldoSalario", "r-si": "saldoTasa", "r-if": "ingresosFin", "r-cm": "consumoMasa", "r-ct": "consumoTasa", "r-em": "empleo", "r-et": "empleoTasa", "r-e2": "empleoTasa2", "r-we": "salarioEmpleo" };
 function cargarRespuestas(r) { for (const [id, k] of Object.entries(mapaResp)) $(id).value = r[k]; }
 
 function estado(nivel, texto) {
@@ -353,10 +373,14 @@ function actualizar() {
   $("o-cm").textContent = fmt(v.resp.consumoMasa, 2) + " puntos";
   $("o-ct").textContent = fmt(v.resp.consumoTasa, 2) + " puntos";
   $("o-em").textContent = pct(v.resp.empleo, true);
-  $("o-et").textContent = fmt(v.resp.empleoTasa, 2) + " puntos";
+  $("o-et").textContent = fmt(v.resp.empleoTasa, 3) + " puntos";
+  $("o-e2").textContent = fmt(v.resp.empleoTasa2 * 10000, 0);
+  { const e30 = -(v.resp.empleoTasa * 30 + v.resp.empleoTasa2 * 900); $("a-e2").textContent = `Con 30 puntos de suba de la tasa, el empleo cae ${fmt(-e30)}%, y la caída adicional es de ${fmt(v.resp.empleoTasa2 * 900)} puntos.`; }
+  $("o-we").textContent = fmt(v.resp.salarioEmpleo, 1) + " puntos";
 
   $("m-infl").innerHTML = pct(r.inflacion) + (r.inflacion <= 18 ? estado("bueno", "baja") : r.inflacion <= 26 ? estado("alerta", "como hoy") : estado("critico", "se acelera"));
   $("m-sal").innerHTML = pct(r.salarioReal, true) + (r.salarioReal > 0.5 ? estado("bueno", "mejora") : r.salarioReal > -0.5 ? estado("alerta", "estancado") : estado("critico", "cae"));
+  $("m-wef").innerHTML = pct(r.salarioEfectivo) + (Math.abs(r.salarioEfectivo - v.pol.salario) > 0.05 ? `<span class="estado">pauta ${fmt(v.pol.salario, 0)}%</span>` : "");
   $("m-emp").innerHTML = pct(r.empleo, true) + (r.empleo > 0.2 ? estado("bueno", "crece") : r.empleo > -0.2 ? estado("alerta", "estable") : estado("critico", "cae"));
   $("m-cons").innerHTML = pct(r.consumo, true) + (r.consumo > 1.5 ? estado("bueno", "crece") : r.consumo > -0.5 ? estado("alerta", "estancado") : estado("critico", "cae"));
   $("m-dev").textContent = pct(r.devaluacion, true);
@@ -396,7 +420,29 @@ function actualizar() {
     g1 = new Chart($("g1"), { type: "scatter", data: { datasets: d1 }, options: opciones("Consumo (%)", "Brecha (miles de millones de USD)", y => fmt(y, 0)) });
     g2 = new Chart($("g2"), { type: "scatter", data: { datasets: d2 }, options: opciones("Consumo (%)", "Inflación (%)", y => fmt(y, 0) + "%") });
   } else { g1.data.datasets = d1; g1.update(); g2.data.datasets = d2; g2.update(); }
+  graficoTasa(v);
   tabla(v.resp);
+}
+
+let g3;
+function graficoTasa(v) {
+  const colores = [css("--serie1"), css("--serie2"), css("--serie3")];
+  const campos = [["salarioReal", "Salario real"], ["empleo", "Empleo"], ["consumo", "Consumo"]];
+  const res = []; for (let i = 5; i <= 100; i++) res.push({ i, r: simular({ ...v.pol, tasa: i }, v.resp) });
+  const ds = campos.map(([c, n], j) => ({ label: n, data: res.map(x => ({ x: x.i, y: x.r[c] })), showLine: true, borderColor: colores[j], backgroundColor: colores[j], borderWidth: 2, pointRadius: 0, pointHitRadius: 6, tension: 0.15, order: 3 }));
+  const act = simular(v.pol, v.resp);
+  ds.push({ label: "Tu tasa", data: campos.map(([c]) => ({ x: v.pol.tasa, y: act[c] })), backgroundColor: css("--tinta"), borderColor: css("--superficie"), borderWidth: 2, pointStyle: "rectRot", pointRadius: 8, order: 1 });
+  // tasa a la que el salario real máximo y el punto donde vuelve a ser negativo
+  let max = res[0]; for (const x of res) if (x.r.salarioReal > max.r.salarioReal) max = x;
+  const giro = res.find(x => x.i > max.i && x.r.salarioReal < 0);
+  $("t-giro").textContent = `Con tus opciones, el salario real llega a su máximo (${pct(max.r.salarioReal, true)}) con una tasa de ${max.i}%` + (giro ? ` y vuelve a caer por debajo de la inflación desde ${giro.i}%, con el empleo en ${pct(giro.r.empleo, true)}.` : ".");
+  const tinta2 = css("--tinta2"), tenue = css("--tenue"), grilla = css("--grilla"), eje = css("--eje");
+  const op = { responsive: true, maintainAspectRatio: false, animation: false, interaction: { mode: "index", intersect: false },
+    plugins: { legend: { position: "bottom", labels: { color: tinta2, usePointStyle: true, boxWidth: 8 } },
+               tooltip: { filter: it => it.dataset.label !== "Tu tasa", callbacks: { title: it => "Tasa " + fmt(it[0].raw.x, 0) + "%", label: c => c.dataset.label + ": " + pct(c.raw.y, true) } } },
+    scales: { x: { type: "linear", min: 5, max: 100, title: { display: true, text: "Tasa de interés nominal (% anual)", color: tinta2 }, grid: { color: grilla }, ticks: { color: tenue, callback: x => x + "%" } },
+              y: { title: { display: true, text: "Variación (%)", color: tinta2 }, grid: { color: c => c.tick.value === 0 ? eje : grilla, lineWidth: c => c.tick.value === 0 ? 1.5 : 1 }, ticks: { color: tenue, callback: x => fmt(x, 0) + "%" } } } };
+  if (!g3) g3 = new Chart($("g3"), { type: "scatter", data: { datasets: ds }, options: op }); else { g3.data.datasets = ds; g3.update(); }
 }
 
 function tabla(resp) {
