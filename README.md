@@ -25,7 +25,7 @@ El gobierno quiere reactivar con dos motores: **salarios por encima de la inflac
 
 ## Qué se puede manipular
 
-- Motores: salario real (con o sin indexación) y tasa de interés nominal (la que compite con el dólar); ritmo devaluatorio. La tasa real resulta de la inflación.
+- Motores: salario real (con o sin indexación) y tasa de interés nominal (la que compite con el dólar); ritmo devaluatorio.
 - Indicadores abiertos: sensibilidad de la cuenta corriente al tipo de cambio real (β), ingresos financieros privados netos, productividad y prima de riesgo.
 - Puentes: saldo de caja de 2026, emisiones locales, repo, swap con Estados Unidos y emisión internacional (solo con prima baja).
 - La página calcula la tasa nominal que cierra la brecha y su efecto en la actividad, y ordena combinaciones de salario y tasa de más a menos sostenible.
