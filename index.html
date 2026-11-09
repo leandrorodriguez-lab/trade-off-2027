@@ -9,7 +9,7 @@
     color-scheme: light;
     --plano: #f9f9f7; --superficie: #fcfcfb; --tinta: #0b0b0b; --tinta2: #52514e; --tenue: #898781;
     --grilla: #e1e0d9; --eje: #c3c2b7; --borde: rgba(11,11,11,0.10);
-    --serie1: #2a78d6; --serie2: #eb6834; --serie3: #1baf7a;
+    --serie1: #2a78d6; --serie2: #eb6834; --serie3: #1baf7a; --serie3v: #6250d6;
     --bueno: #0ca30c; --alerta: #fab219; --critico: #d03b3b; --fondo-critico: rgba(208,59,59,0.07);
   }
   @media (prefers-color-scheme: dark) {
@@ -17,7 +17,7 @@
       color-scheme: dark;
       --plano: #0d0d0d; --superficie: #1a1a19; --tinta: #f0efec; --tinta2: #c3c2b7; --tenue: #898781;
       --grilla: #2c2c2a; --eje: #383835; --borde: rgba(255,255,255,0.10);
-      --serie1: #3987e5; --serie2: #d95926; --serie3: #199e70; --fondo-critico: rgba(230,103,103,0.10);
+      --serie1: #3987e5; --serie2: #d95926; --serie3: #199e70; --serie3v: #9085e9; --fondo-critico: rgba(230,103,103,0.10);
     }
   }
   * { box-sizing: border-box; }
@@ -123,7 +123,7 @@
       <div class="control">
         <label for="tasa">Tasa de interés nominal (anual) <output id="o-tasa"></output></label>
         <input type="range" id="tasa" min="5" max="100" step="1">
-        <div class="ayuda">Motor 2: crédito. Más baja, más crédito y consumo. Es la tasa que compite con el dólar: contiene la dolarización si supera a la devaluación más la prima de riesgo.</div>
+        <div class="ayuda">Cumple dos funciones: sostiene el dólar (limita la dolarización si supera a la devaluación más la prima) y regula el crédito y el consumo (motor 2). Más baja, más consumo y más dolarización.</div>
       </div>
       <div class="control">
         <label for="dev">Ritmo devaluatorio mensual <output id="o-dev"></output></label>
@@ -196,6 +196,17 @@
       <div class="paso"><div class="num">4</div><div class="titulo">Tasa para cerrar la brecha</div><div class="grande" id="p4"></div><div class="det" id="p4d"></div></div>
     </div>
     <button class="accion" id="aplicar">Aplicar la tasa que cierra la brecha</button>
+  </section>
+
+  <section class="tarjeta">
+    <h2>Las dos funciones de la tasa de interés</h2>
+    <p class="sub chico">La misma tasa nominal sostiene el dólar, porque limita la dolarización cuando supera a la devaluación más la prima de riesgo, y frena el crecimiento por el lado del crédito y el consumo. Los tres gráficos muestran qué pasa al moverla, con el resto de tus opciones fijo. El rombo negro marca tu tasa (<span id="t-tasa"></span>) y el violeta, la tasa que cierra la brecha (<span id="t-cierre"></span>).</p>
+    <p class="chico" id="t-condicion"></p>
+    <div class="grilla g3">
+      <div><h3>1. Contiene al dólar</h3><div class="graf" style="height:260px"><canvas id="f1" aria-label="Dolarización y brecha según la tasa"></canvas></div></div>
+      <div><h3>2. Sostiene el tipo de cambio real</h3><div class="graf" style="height:260px"><canvas id="f2" aria-label="Tipo de cambio real según la tasa"></canvas></div></div>
+      <div><h3>3. Frena el consumo y la actividad</h3><div class="graf" style="height:260px"><canvas id="f3" aria-label="Consumo y actividad según la tasa"></canvas></div></div>
+    </div>
   </section>
 
   <section>
@@ -383,7 +394,50 @@ function actualizar() {
     g1 = new Chart($("g1"), { type: "scatter", data: { datasets: d1 }, options: opcionesGrafico("Brecha (miles de millones de USD)", y => fmt(y, 0)) });
     g2 = new Chart($("g2"), { type: "scatter", data: { datasets: d2 }, options: opcionesGrafico("Actividad (%)", y => fmt(y, 0) + "%") });
   } else { g1.data.datasets = d1; g1.update(); g2.data.datasets = d2; g2.update(); }
+  graficosTasa(v, r, c);
   ranking(v); tabla(v.ab);
+}
+
+let f1, f2, f3;
+function opcionesTasa(yTitulo, yFmt) {
+  const tinta2 = css("--tinta2"), tenue = css("--tenue"), grilla = css("--grilla"), eje = css("--eje");
+  return {
+    responsive: true, maintainAspectRatio: false, animation: false,
+    interaction: { mode: "nearest", intersect: false },
+    plugins: {
+      legend: { position: "bottom", labels: { color: tinta2, usePointStyle: true, boxWidth: 8, font: { size: 11 } } },
+      tooltip: { callbacks: { title: it => it[0].dataset.label + " · tasa " + fmt(it[0].raw.x, 0) + "%", label: c => yFmt(c.raw.y) } }
+    },
+    scales: {
+      x: { type: "linear", min: 5, max: 80, title: { display: true, text: "Tasa de interés nominal (% anual)", color: tinta2 }, grid: { color: grilla }, ticks: { color: tenue, callback: v => v + "%" } },
+      y: { title: { display: true, text: yTitulo, color: tinta2 }, grid: { color: c => c.tick.value === 0 ? eje : grilla, lineWidth: c => c.tick.value === 0 ? 1.5 : 1 }, ticks: { color: tenue, callback: v => yFmt(v) } }
+    }
+  };
+}
+function seriesTasa(v, campos, c) {
+  const colores = [css("--serie1"), css("--serie2")];
+  const res = [];
+  for (let i = 5; i <= 80; i++) res.push({ i, r: simular({ ...v.pol, tasa: i }, v.ab) });
+  const ds = campos.map(([campo, etiqueta, tr], j) => ({ label: etiqueta, data: res.map(x => ({ x: x.i, y: tr(x.r[campo]) })), showLine: true, borderColor: colores[j], backgroundColor: colores[j], borderWidth: 2, pointRadius: 0, pointHitRadius: 6, tension: 0.2, order: 3 }));
+  const actual = simular(v.pol, v.ab);
+  ds.push({ label: "Tu tasa", data: campos.map(([campo, , tr]) => ({ x: v.pol.tasa, y: tr(actual[campo]) })), backgroundColor: css("--tinta"), borderColor: css("--superficie"), borderWidth: 2, pointStyle: "rectRot", pointRadius: 8, order: 1 });
+  if (c.necesaria && c.tasa !== null && c.tasa <= 80)
+    ds.push({ label: "Tasa que cierra la brecha", data: campos.map(([campo, , tr]) => ({ x: c.tasa, y: tr(c.r[campo]) })), backgroundColor: css("--serie3v"), borderColor: css("--superficie"), borderWidth: 2, pointStyle: "rectRot", pointRadius: 8, order: 2 });
+  return ds;
+}
+function graficosTasa(v, r, c) {
+  $("t-tasa").textContent = fmt(v.pol.tasa, 0) + "%";
+  $("t-cierre").textContent = !c.necesaria ? "no hace falta subirla" : c.tasa === null ? "ninguna alcanza" : fmt(c.tasa, 0) + "%";
+  $("t-condicion").textContent = `Con tu tasa, los pesos rinden ${pct(r.rendDolares, true)} medidos en dólares (tasa ${fmt(v.pol.tasa, 0)}% frente a una devaluación anual de ${pct(r.devAnual)}), contra una prima de ${pct(r.prima)} (base ${pct(v.ab.primaBase)} más un salto esperado de ${pct(r.salto)}). ` + (r.diferencial >= 0 ? "Conviene quedarse en pesos." : `Faltan ${fmt(-r.diferencial)} puntos para que convenga quedarse en pesos.`);
+  const milesM = x => x / 1000;
+  const d1 = seriesTasa(v, [["dolarizacion", "Dolarización", milesM], ["brecha", "Brecha sin cubrir", milesM]], c);
+  const d2 = seriesTasa(v, [["tcr", "Tipo de cambio real", x => x]], c);
+  const d3 = seriesTasa(v, [["consumo", "Consumo", x => x], ["actividad", "Actividad", x => x]], c);
+  if (!f1) {
+    f1 = new Chart($("f1"), { type: "scatter", data: { datasets: d1 }, options: opcionesTasa("Miles de millones de USD", y => fmt(y, 0)) });
+    f2 = new Chart($("f2"), { type: "scatter", data: { datasets: d2 }, options: opcionesTasa("Variación (%)", y => fmt(y, 0) + "%") });
+    f3 = new Chart($("f3"), { type: "scatter", data: { datasets: d3 }, options: opcionesTasa("Variación (%)", y => fmt(y, 0) + "%") });
+  } else { f1.data.datasets = d1; f1.update(); f2.data.datasets = d2; f2.update(); f3.data.datasets = d3; f3.update(); }
 }
 
 function ranking(v) {

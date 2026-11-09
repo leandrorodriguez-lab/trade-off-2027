@@ -23,7 +23,7 @@ const PARAMS = {
   tasaNeutral: 5,     // tasa real neutral (%)
   gamma: 0.3,         // sensibilidad de la demanda a la tasa real
   lambda: 0.3,        // impulso del salario real sobre la demanda
-  brechaMin: -6, brechaMax: 5,
+  brechaMin: -9, brechaMax: 5,
   actividadBase: 0.5, // crecimiento sin impulsos (%)
 
   // Cuenta corriente (total, con intereses)
